@@ -1,13 +1,41 @@
+# ============================================================
+# AGRIMIND AI - PLANT DISEASE DETECTION
+# TensorFlow Lazy Loading / Render Friendly
+# ============================================================
+
 import os
+
 import numpy as np
 from PIL import Image
 
-# Reduce TensorFlow memory/thread usage
+
+# ============================================================
+# TENSORFLOW ENVIRONMENT SETTINGS
+# ============================================================
+
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("TF_NUM_INTRAOP_THREADS", "1")
 os.environ.setdefault("TF_NUM_INTEROP_THREADS", "1")
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# ============================================================
+# PATHS
+# ============================================================
+
+# disease_model.py is inside:
+# project/
+# ├── app.py
+# ├── backend/
+# │   └── disease_model.py
+# └── models/
+#     └── plant_disease_model.keras
+
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
 
 MODEL_PATH = os.path.join(
     BASE_DIR,
@@ -15,39 +43,67 @@ MODEL_PATH = os.path.join(
     "plant_disease_model.keras"
 )
 
+
+# ============================================================
+# IMAGE SIZE
+# ============================================================
+
 IMAGE_SIZE = (128, 128)
+
+
+# ============================================================
+# MODEL
+# ============================================================
 
 model = None
 
+
+# ============================================================
+# PLANTVILLAGE 38 CLASSES
+# ============================================================
+
 CLASS_NAMES = [
+
     "Apple___Apple_scab",
     "Apple___Black_rot",
     "Apple___Cedar_apple_rust",
     "Apple___healthy",
+
     "Blueberry___healthy",
+
     "Cherry_(including_sour)___Powdery_mildew",
     "Cherry_(including_sour)___healthy",
+
     "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
     "Corn_(maize)___Common_rust_",
     "Corn_(maize)___Northern_Leaf_Blight",
     "Corn_(maize)___healthy",
+
     "Grape___Black_rot",
     "Grape___Esca_(Black_Measles)",
     "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
     "Grape___healthy",
+
     "Orange___Haunglongbing_(Citrus_greening)",
+
     "Peach___Bacterial_spot",
     "Peach___healthy",
+
     "Pepper,_bell___Bacterial_spot",
     "Pepper,_bell___healthy",
+
     "Potato___Early_blight",
     "Potato___Late_blight",
     "Potato___healthy",
+
     "Raspberry___healthy",
     "Soybean___healthy",
+
     "Squash___Powdery_mildew",
+
     "Strawberry___Leaf_scorch",
     "Strawberry___healthy",
+
     "Tomato___Bacterial_spot",
     "Tomato___Early_blight",
     "Tomato___Late_blight",
@@ -61,30 +117,58 @@ CLASS_NAMES = [
 ]
 
 
+# ============================================================
+# CHECK MODEL
+# ============================================================
+
 def get_model():
 
     global model
 
+    # Already loaded
     if model is not None:
         return model
 
+    # Check file
     if not os.path.isfile(MODEL_PATH):
+
         raise FileNotFoundError(
-            f"Disease model not found at: {MODEL_PATH}"
+            "Plant disease model not found.\n"
+            f"Expected location:\n{MODEL_PATH}"
         )
 
     print("==============================================")
-    print("Loading disease model...")
+    print("Loading PlantVillage disease model...")
     print("==============================================")
 
     try:
 
+        # TensorFlow is imported ONLY when prediction
+        # is actually requested.
         import tensorflow as tf
 
-        # Keep TensorFlow CPU usage small on Render
+        # CPU only
         try:
-            tf.config.threading.set_intra_op_parallelism_threads(1)
-            tf.config.threading.set_inter_op_parallelism_threads(1)
+
+            tf.config.set_visible_devices(
+                [],
+                "GPU"
+            )
+
+        except Exception:
+            pass
+
+        # Limit CPU threads
+        try:
+
+            tf.config.threading.set_intra_op_parallelism_threads(
+                1
+            )
+
+            tf.config.threading.set_inter_op_parallelism_threads(
+                1
+            )
+
         except Exception:
             pass
 
@@ -95,42 +179,84 @@ def get_model():
             compile=False
         )
 
-        print("✓ Disease model loaded")
-        print("Input shape:", model.input_shape)
-        print("Output shape:", model.output_shape)
+        print("✓ Disease model loaded successfully.")
+        print(
+            "Input shape:",
+            model.input_shape
+        )
+
+        print(
+            "Output shape:",
+            model.output_shape
+        )
+
+        # Verify output classes
+        output_shape = model.output_shape
+
+        if isinstance(output_shape, list):
+
+            output_count = output_shape[0][-1]
+
+        else:
+
+            output_count = output_shape[-1]
+
+        if output_count != len(CLASS_NAMES):
+
+            raise RuntimeError(
+                "Disease model output mismatch.\n"
+                f"Model outputs: {output_count}\n"
+                f"Configured classes: {len(CLASS_NAMES)}"
+            )
 
         return model
 
     except Exception as error:
 
-        print("❌ Disease model loading failed")
+        print("❌ Disease model loading failed:")
         print(error)
 
-        raise
+        raise RuntimeError(
+            f"Unable to load disease model: {error}"
+        )
 
+
+# ============================================================
+# CLEAN DISEASE NAME
+# ============================================================
 
 def clean_disease_name(name):
 
     return (
         str(name)
-        .replace("___", " - ")
-        .replace("_", " ")
+        .replace(
+            "___",
+            " - "
+        )
+        .replace(
+            "_",
+            " "
+        )
     )
 
 
-def predict_disease(image_path):
+# ============================================================
+# PREPARE IMAGE
+# ============================================================
+
+def prepare_image(image_path):
 
     if not image_path:
-        raise ValueError("No image path provided.")
 
-    if not os.path.isfile(image_path):
-        raise FileNotFoundError(
-            f"Image not found: {image_path}"
+        raise ValueError(
+            "No image path provided."
         )
 
-    # Load TensorFlow model only when disease detection
-    # is actually requested.
-    current_model = get_model()
+    if not os.path.isfile(image_path):
+
+        raise FileNotFoundError(
+            f"Image not found:\n{image_path}"
+        )
 
     try:
 
@@ -144,22 +270,160 @@ def predict_disease(image_path):
             f"Unable to open image: {error}"
         )
 
+    # Resize
     image = image.resize(
         IMAGE_SIZE,
         Image.Resampling.LANCZOS
     )
 
+    # Convert to numpy
     image_array = np.asarray(
         image,
         dtype=np.float32
     )
 
-    image_array = image_array / 255.0
+    # Normalize
+    image_array /= 255.0
 
+    # Add batch dimension
     image_array = np.expand_dims(
         image_array,
         axis=0
     )
+
+    return image_array
+
+
+# ============================================================
+# CONVERT OUTPUT TO PROBABILITIES
+# ============================================================
+
+def get_probabilities(predictions):
+
+    predictions = np.asarray(
+        predictions,
+        dtype=np.float32
+    )
+
+    # Expected:
+    # (1, 38)
+    if predictions.ndim == 2:
+
+        probabilities = predictions[0]
+
+    elif predictions.ndim == 1:
+
+        probabilities = predictions
+
+    else:
+
+        raise RuntimeError(
+            "Unexpected model prediction shape: "
+            f"{predictions.shape}"
+        )
+
+    # Check class count
+    if len(probabilities) != len(CLASS_NAMES):
+
+        raise RuntimeError(
+            "Model output does not match "
+            "PlantVillage classes.\n"
+            f"Model output: {len(probabilities)}\n"
+            f"Expected: {len(CLASS_NAMES)}"
+        )
+
+    # Make a copy
+    probabilities = np.asarray(
+        probabilities,
+        dtype=np.float32
+    )
+
+    # --------------------------------------------------------
+    # If output is already probabilities
+    # --------------------------------------------------------
+
+    total = float(
+        np.sum(probabilities)
+    )
+
+    valid_probability_output = (
+
+        np.all(probabilities >= 0)
+
+        and
+
+        np.all(probabilities <= 1)
+
+        and
+
+        abs(total - 1.0) < 0.05
+
+    )
+
+    if valid_probability_output:
+
+        return probabilities
+
+    # --------------------------------------------------------
+    # Otherwise treat output as logits
+    # --------------------------------------------------------
+
+    shifted = (
+        probabilities
+        -
+        np.max(probabilities)
+    )
+
+    exp_values = np.exp(
+        shifted
+    )
+
+    denominator = float(
+        np.sum(exp_values)
+    )
+
+    if denominator <= 0:
+
+        raise RuntimeError(
+            "Unable to calculate prediction probabilities."
+        )
+
+    probabilities = (
+        exp_values /
+        denominator
+    )
+
+    return probabilities
+
+
+# ============================================================
+# PREDICT DISEASE
+# ============================================================
+
+def predict_disease(image_path):
+
+    print("==============================================")
+    print("Disease prediction requested")
+    print("Image:", image_path)
+    print("==============================================")
+
+    # --------------------------------------------------------
+    # Prepare image
+    # --------------------------------------------------------
+
+    image_array = prepare_image(
+        image_path
+    )
+
+    # --------------------------------------------------------
+    # Load model only now
+    # --------------------------------------------------------
+
+    current_model = get_model()
+
+    # --------------------------------------------------------
+    # Prediction
+    # --------------------------------------------------------
 
     try:
 
@@ -170,62 +434,48 @@ def predict_disease(image_path):
 
     except Exception as error:
 
+        print("❌ Disease prediction error:")
+        print(error)
+
         raise RuntimeError(
             f"Disease prediction failed: {error}"
         )
 
-    predictions = np.asarray(predictions)
+    # --------------------------------------------------------
+    # Probabilities
+    # --------------------------------------------------------
 
-    if predictions.ndim == 2:
-        probabilities = predictions[0]
+    probabilities = get_probabilities(
+        predictions
+    )
 
-    elif predictions.ndim == 1:
-        probabilities = predictions
-
-    else:
-        raise RuntimeError(
-            f"Unexpected prediction shape: {predictions.shape}"
-        )
-
-    if len(probabilities) != len(CLASS_NAMES):
-
-        raise RuntimeError(
-            f"Model has {len(probabilities)} outputs, "
-            f"but {len(CLASS_NAMES)} classes are configured."
-        )
-
-    # Make sure probabilities are valid
-    total = float(np.sum(probabilities))
-
-    if (
-        np.any(probabilities < 0)
-        or np.any(probabilities > 1)
-        or abs(total - 1.0) > 0.05
-    ):
-
-        shifted = (
-            probabilities -
-            np.max(probabilities)
-        )
-
-        exp_values = np.exp(shifted)
-
-        probabilities = (
-            exp_values /
-            np.sum(exp_values)
-        )
+    # --------------------------------------------------------
+    # Best class
+    # --------------------------------------------------------
 
     predicted_index = int(
-        np.argmax(probabilities)
+        np.argmax(
+            probabilities
+        )
     )
 
     confidence = float(
-        probabilities[predicted_index]
+        probabilities[
+            predicted_index
+        ]
     )
 
     disease = CLASS_NAMES[
         predicted_index
     ]
+
+    disease_display = clean_disease_name(
+        disease
+    )
+
+    # --------------------------------------------------------
+    # Top 3 predictions
+    # --------------------------------------------------------
 
     top_indices = np.argsort(
         probabilities
@@ -251,12 +501,17 @@ def predict_disease(image_path):
                     ) * 100,
                     2
                 )
+
         })
 
-    return {
+    # --------------------------------------------------------
+    # Final result
+    # --------------------------------------------------------
+
+    result = {
 
         "disease":
-            clean_disease_name(disease),
+            disease_display,
 
         "confidence":
             round(
@@ -272,9 +527,29 @@ def predict_disease(image_path):
 
         "model_status":
             "Real PlantVillage disease model"
+
     }
 
+    print(
+        "Disease:",
+        disease_display
+    )
+
+    print(
+        "Confidence:",
+        result["confidence"],
+        "%"
+    )
+
+    return result
+
+
+# ============================================================
+# ALIAS
+# ============================================================
 
 def detect_disease(image_path):
 
-    return predict_disease(image_path)
+    return predict_disease(
+        image_path
+    )
