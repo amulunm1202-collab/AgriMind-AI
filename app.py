@@ -1,4 +1,11 @@
 import os
+
+# Render does not provide a GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
+
+import os
 import io
 import json
 import random
@@ -25,14 +32,13 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not GEMINI_API_KEY:
-    print("⚠️ GEMINI_API_KEY is not configured.")
+client = None
 
-client = genai.Client(
-    api_key=GEMINI_API_KEY
-)
-from google.genai import types
-
+if GEMINI_API_KEY:
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    print("✅ Gemini AI configured.")
+else:
+    print("⚠️ Gemini AI is not configured. Continuing without Gemini.")
 from flask import (
     Flask,
     render_template,
@@ -4066,7 +4072,9 @@ def assess_drought():
 # ============================================================
 
 if __name__ == "__main__":
-
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
     init_database()
 
     print()

@@ -1,8 +1,10 @@
 # ============================================================
 # AGRIMIND AI - SOIL ANALYSIS MODEL
+# RENDER SAFE VERSION
 # ============================================================
 
 import os
+
 import pandas as pd
 import numpy as np
 
@@ -21,20 +23,25 @@ BASE_DIR = os.path.dirname(
 # ============================================================
 
 DATA_PATH = os.path.abspath(
+
     os.path.join(
+
         BASE_DIR,
         "..",
         "data",
         "soil_data.csv"
+
     )
+
 )
 
 
 # ============================================================
-# EXPECTED SOIL FEATURES
+# SOIL FEATURES
 # ============================================================
 
 SOIL_FEATURES = [
+
     "ph",
     "ec",
     "oc",
@@ -47,22 +54,26 @@ SOIL_FEATURES = [
     "fe",
     "mn",
     "cu"
+
 ]
 
 
 # ============================================================
-# LOAD REAL SOIL DATASET
+# LOAD DATASET
 # ============================================================
 
-print("\n==============================================")
-print("       LOADING REAL SOIL DATA")
 print("==============================================")
+print("Loading soil dataset...")
+print("==============================================")
+
 
 if not os.path.isfile(DATA_PATH):
 
     raise FileNotFoundError(
-        "\nReal soil dataset not found.\n"
+
+        "\nSoil dataset not found.\n"
         f"Expected:\n{DATA_PATH}\n"
+
     )
 
 
@@ -80,20 +91,26 @@ except Exception as error:
 
 
 # ============================================================
-# CLEAN COLUMN NAMES
+# CLEAN COLUMNS
 # ============================================================
 
 soil_data.columns = (
+
     soil_data.columns
     .str.strip()
     .str.lower()
-    .str.replace(" ", "_")
+    .str.replace(
+        " ",
+        "_"
+    )
+
 )
 
 
-print("Dataset:", DATA_PATH)
-print("Samples:", len(soil_data))
-print("Columns:", list(soil_data.columns))
+print(
+    "Soil samples:",
+    len(soil_data)
+)
 
 
 # ============================================================
@@ -114,28 +131,30 @@ missing_features = [
 if missing_features:
 
     raise ValueError(
-        "\nMissing soil features:\n"
+
+        "Missing soil features:\n"
         + str(missing_features)
+
     )
 
 
-print("✓ All required soil features found.")
-
-
 # ============================================================
-# CONVERT FEATURES TO NUMERIC
+# NUMERIC CONVERSION
 # ============================================================
 
 for feature in SOIL_FEATURES:
 
     soil_data[feature] = pd.to_numeric(
+
         soil_data[feature],
+
         errors="coerce"
+
     )
 
 
 # ============================================================
-# DATA STATISTICS
+# DATASET LIMITS
 # ============================================================
 
 SOIL_LIMITS = {}
@@ -143,13 +162,20 @@ SOIL_LIMITS = {}
 
 for feature in SOIL_FEATURES:
 
-    values = soil_data[
-        feature
-    ].dropna()
+    values = (
+
+        soil_data[
+            feature
+        ]
+        .dropna()
+
+    )
+
 
     if len(values) == 0:
 
         continue
+
 
     SOIL_LIMITS[feature] = {
 
@@ -165,7 +191,7 @@ for feature in SOIL_FEATURES:
     }
 
 
-print("\n✓ Soil statistics loaded.")
+print("✓ Soil dataset ready.")
 
 
 # ============================================================
@@ -174,18 +200,13 @@ print("\n✓ Soil statistics loaded.")
 
 def analyze_soil(values):
 
-    """
-    Analyze soil using the real ranges/statistics
-    contained in soil_data.csv.
-    """
-
     if not isinstance(
         values,
         dict
     ):
 
         raise ValueError(
-            "Soil values must be provided as a dictionary."
+            "Soil values must be a dictionary."
         )
 
 
@@ -204,6 +225,7 @@ def analyze_soil(values):
                 f"Missing soil value: {feature}"
             )
 
+
         try:
 
             number = float(
@@ -213,8 +235,10 @@ def analyze_soil(values):
         except Exception:
 
             raise ValueError(
+
                 f"Invalid value for {feature}: "
                 f"{values[feature]}"
+
             )
 
 
@@ -229,7 +253,7 @@ def analyze_soil(values):
 
 
     # ========================================================
-    # INDIVIDUAL NUTRIENT ASSESSMENT
+    # NUTRIENT STATUS
     # ========================================================
 
     nutrient_status = {}
@@ -237,7 +261,10 @@ def analyze_soil(values):
 
     for feature in SOIL_FEATURES:
 
-        value = cleaned[feature]
+        value = cleaned[
+            feature
+        ]
+
 
         limits = SOIL_LIMITS.get(
             feature
@@ -247,21 +274,32 @@ def analyze_soil(values):
         if not limits:
 
             nutrient_status[feature] = {
-                "value": value,
-                "status": "Unknown"
+
+                "value":
+                    value,
+
+                "status":
+                    "Unknown"
+
             }
 
             continue
 
 
-        minimum = limits["min"]
-        maximum = limits["max"]
-        mean = limits["mean"]
+        minimum = limits[
+            "min"
+        ]
 
 
-        # ----------------------------------------------------
-        # Relative position inside the REAL dataset range
-        # ----------------------------------------------------
+        maximum = limits[
+            "max"
+        ]
+
+
+        mean = limits[
+            "mean"
+        ]
+
 
         if maximum == minimum:
 
@@ -270,15 +308,15 @@ def analyze_soil(values):
         else:
 
             relative = (
+
                 value - minimum
+
             ) / (
+
                 maximum - minimum
+
             )
 
-
-        # ----------------------------------------------------
-        # Categorize
-        # ----------------------------------------------------
 
         if relative < 0.25:
 
@@ -318,21 +356,13 @@ def analyze_soil(values):
 
 
     # ========================================================
-    # IMPORTANT SOIL FACTORS
+    # PH
     # ========================================================
 
-    score_parts = []
+    ph = cleaned[
+        "ph"
+    ]
 
-
-    # --------------------------------------------------------
-    # pH
-    # --------------------------------------------------------
-
-    ph = cleaned["ph"]
-
-
-    # General agricultural interpretation.
-    # This is an analysis guideline, not a laboratory diagnosis.
 
     if 6.0 <= ph <= 7.5:
 
@@ -340,13 +370,21 @@ def analyze_soil(values):
 
         ph_status = "Optimal"
 
-    elif 5.5 <= ph < 6.0 or 7.5 < ph <= 8.0:
+    elif (
+        5.5 <= ph < 6.0
+        or
+        7.5 < ph <= 8.0
+    ):
 
         ph_score = 75
 
         ph_status = "Acceptable"
 
-    elif 5.0 <= ph < 5.5 or 8.0 < ph <= 8.5:
+    elif (
+        5.0 <= ph < 5.5
+        or
+        8.0 < ph <= 8.5
+    ):
 
         ph_score = 50
 
@@ -359,19 +397,23 @@ def analyze_soil(values):
         ph_status = "Poor"
 
 
-    score_parts.append(
+    score_parts = [
+
         ph_score
-    )
+
+    ]
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # NPK
-    # --------------------------------------------------------
+    # ========================================================
 
     for nutrient in [
+
         "n",
         "p",
         "k"
+
     ]:
 
         status = nutrient_status[
@@ -405,9 +447,9 @@ def analyze_soil(values):
         )
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # ORGANIC CARBON
-    # --------------------------------------------------------
+    # ========================================================
 
     oc_status = nutrient_status[
         "oc"
@@ -416,37 +458,48 @@ def analyze_soil(values):
 
     if oc_status == "Low":
 
-        score_parts.append(30)
+        score_parts.append(
+            30
+        )
 
     elif oc_status == "Moderate":
 
-        score_parts.append(60)
+        score_parts.append(
+            60
+        )
 
     elif oc_status == "Good":
 
-        score_parts.append(90)
+        score_parts.append(
+            90
+        )
 
     else:
 
-        score_parts.append(75)
+        score_parts.append(
+            75
+        )
 
 
     # ========================================================
-    # FINAL SOIL SCORE
+    # SCORE
     # ========================================================
 
     soil_score = round(
+
         float(
             np.mean(
                 score_parts
             )
         ),
+
         1
+
     )
 
 
     # ========================================================
-    # SOIL CONDITION
+    # CONDITION
     # ========================================================
 
     if soil_score >= 80:
@@ -463,13 +516,14 @@ def analyze_soil(values):
 
 
     # ========================================================
-    # FIND LIMITING FACTORS
+    # LIMITING FACTORS
     # ========================================================
 
     limiting_factors = []
 
 
     for nutrient in [
+
         "n",
         "p",
         "k",
@@ -480,6 +534,7 @@ def analyze_soil(values):
         "mn",
         "cu",
         "oc"
+
     ]:
 
         if nutrient not in nutrient_status:
@@ -487,9 +542,15 @@ def analyze_soil(values):
             continue
 
 
-        if nutrient_status[
-            nutrient
-        ]["status"] == "Low":
+        if (
+
+            nutrient_status[
+                nutrient
+            ]["status"]
+
+            == "Low"
+
+        ):
 
             limiting_factors.append(
                 nutrient.upper()
@@ -497,8 +558,10 @@ def analyze_soil(values):
 
 
     if ph_status in [
+
         "Needs attention",
         "Poor"
+
     ]:
 
         limiting_factors.append(
@@ -516,62 +579,86 @@ def analyze_soil(values):
     if ph_status == "Optimal":
 
         recommendations.append(
-            "Soil pH is within a generally suitable agricultural range."
+
+            "Soil pH is within a generally "
+            "suitable agricultural range."
+
         )
 
     elif ph_status == "Acceptable":
 
         recommendations.append(
-            "Soil pH is acceptable but should be monitored."
+
+            "Soil pH is acceptable but "
+            "should be monitored."
+
         )
 
     else:
 
         recommendations.append(
-            "Soil pH may require crop-specific management."
+
+            "Soil pH may require "
+            "crop-specific management."
+
         )
 
 
     if nutrient_status["n"]["status"] == "Low":
 
         recommendations.append(
-            "Nitrogen appears low relative to the dataset range."
+
+            "Nitrogen appears low relative "
+            "to the dataset range."
+
         )
 
 
     if nutrient_status["p"]["status"] == "Low":
 
         recommendations.append(
-            "Phosphorus appears low relative to the dataset range."
+
+            "Phosphorus appears low relative "
+            "to the dataset range."
+
         )
 
 
     if nutrient_status["k"]["status"] == "Low":
 
         recommendations.append(
-            "Potassium appears low relative to the dataset range."
+
+            "Potassium appears low relative "
+            "to the dataset range."
+
         )
 
 
     if nutrient_status["oc"]["status"] == "Low":
 
         recommendations.append(
-            "Organic carbon is low relative to the dataset range."
+
+            "Organic carbon is low relative "
+            "to the dataset range."
+
         )
 
 
     if not recommendations:
 
         recommendations.append(
-            "Maintain regular soil monitoring and balanced nutrient management."
+
+            "Maintain regular soil monitoring "
+            "and balanced nutrient management."
+
         )
 
 
     # ========================================================
-    # FINAL RESULT
+    # RESULT
     # ========================================================
 
-    result = {
+    return {
 
         "success":
             True,
@@ -583,7 +670,10 @@ def analyze_soil(values):
             soil_condition,
 
         "ph":
-            round(ph, 2),
+            round(
+                ph,
+                2
+            ),
 
         "ph_status":
             ph_status,
@@ -598,7 +688,9 @@ def analyze_soil(values):
             recommendations,
 
         "sample_count":
-            int(len(soil_data)),
+            int(
+                len(soil_data)
+            ),
 
         "model_status":
             "Real soil dataset analysis",
@@ -609,24 +701,11 @@ def analyze_soil(values):
     }
 
 
-    return result
-
-
 # ============================================================
-# SOIL FERTILITY PREDICTION FUNCTION
+# COMPATIBILITY FUNCTION
 # ============================================================
 
-def predict_soil_fertility(
-    values
-):
-
-    """
-    Compatibility function for app.py.
-
-    Existing Flask code can continue using:
-
-        predict_soil_fertility(values)
-    """
+def predict_soil_fertility(values):
 
     return analyze_soil(
         values
@@ -645,7 +724,9 @@ def get_soil_dataset_info():
             DATA_PATH,
 
         "samples":
-            int(len(soil_data)),
+            int(
+                len(soil_data)
+            ),
 
         "features":
             SOIL_FEATURES,
@@ -657,5 +738,4 @@ def get_soil_dataset_info():
 
 
 print("✓ REAL SOIL ANALYSIS READY")
-print("Features:", SOIL_FEATURES)
 print("==============================================")
