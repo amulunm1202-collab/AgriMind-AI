@@ -1,31 +1,13 @@
-# ============================================================
-# AGRIMIND AI - PLANT DISEASE DETECTION
-# LAZY LOADING VERSION FOR RENDER
-# ============================================================
-
 import os
+import numpy as np
+from PIL import Image
 
-# Reduce TensorFlow startup logging
+# Reduce TensorFlow memory/thread usage
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 os.environ.setdefault("TF_NUM_INTRAOP_THREADS", "1")
 os.environ.setdefault("TF_NUM_INTEROP_THREADS", "1")
 
-import numpy as np
-from PIL import Image
-
-
-# ============================================================
-# BASE DIRECTORY
-# ============================================================
-
-BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
-
-
-# ============================================================
-# MODEL PATH
-# ============================================================
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MODEL_PATH = os.path.join(
     BASE_DIR,
@@ -33,53 +15,39 @@ MODEL_PATH = os.path.join(
     "plant_disease_model.keras"
 )
 
+IMAGE_SIZE = (128, 128)
 
-# ============================================================
-# PLANTVILLAGE 38 CLASSES
-# ============================================================
+model = None
 
 CLASS_NAMES = [
-
     "Apple___Apple_scab",
     "Apple___Black_rot",
     "Apple___Cedar_apple_rust",
     "Apple___healthy",
-
     "Blueberry___healthy",
-
     "Cherry_(including_sour)___Powdery_mildew",
     "Cherry_(including_sour)___healthy",
-
     "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
     "Corn_(maize)___Common_rust_",
     "Corn_(maize)___Northern_Leaf_Blight",
     "Corn_(maize)___healthy",
-
     "Grape___Black_rot",
     "Grape___Esca_(Black_Measles)",
     "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
     "Grape___healthy",
-
     "Orange___Haunglongbing_(Citrus_greening)",
-
     "Peach___Bacterial_spot",
     "Peach___healthy",
-
     "Pepper,_bell___Bacterial_spot",
     "Pepper,_bell___healthy",
-
     "Potato___Early_blight",
     "Potato___Late_blight",
     "Potato___healthy",
-
     "Raspberry___healthy",
     "Soybean___healthy",
-
     "Squash___Powdery_mildew",
-
     "Strawberry___Leaf_scorch",
     "Strawberry___healthy",
-
     "Tomato___Bacterial_spot",
     "Tomato___Early_blight",
     "Tomato___Late_blight",
@@ -93,25 +61,6 @@ CLASS_NAMES = [
 ]
 
 
-# ============================================================
-# IMAGE SIZE
-# ============================================================
-
-IMAGE_SIZE = (128, 128)
-
-
-# ============================================================
-# GLOBAL MODEL
-# IMPORTANT: DO NOT LOAD AT STARTUP
-# ============================================================
-
-model = None
-
-
-# ============================================================
-# LOAD MODEL ONLY WHEN NEEDED
-# ============================================================
-
 def get_model():
 
     global model
@@ -120,17 +69,24 @@ def get_model():
         return model
 
     if not os.path.isfile(MODEL_PATH):
-
         raise FileNotFoundError(
-            "\nPlant disease model not found.\n"
-            f"Expected location:\n{MODEL_PATH}\n"
+            f"Disease model not found at: {MODEL_PATH}"
         )
 
     print("==============================================")
-    print("Loading plant disease model...")
+    print("Loading disease model...")
     print("==============================================")
 
     try:
+
+        import tensorflow as tf
+
+        # Keep TensorFlow CPU usage small on Render
+        try:
+            tf.config.threading.set_intra_op_parallelism_threads(1)
+            tf.config.threading.set_inter_op_parallelism_threads(1)
+        except Exception:
+            pass
 
         from tensorflow.keras.models import load_model
 
@@ -139,75 +95,42 @@ def get_model():
             compile=False
         )
 
-        print("✓ Disease model loaded.")
-        print("Input:", model.input_shape)
-        print("Output:", model.output_shape)
+        print("✓ Disease model loaded")
+        print("Input shape:", model.input_shape)
+        print("Output shape:", model.output_shape)
+
+        return model
 
     except Exception as error:
 
-        print("❌ Disease model load error:")
+        print("❌ Disease model loading failed")
         print(error)
 
         raise
 
-    return model
-
-
-# ============================================================
-# CLEAN DISEASE NAME
-# ============================================================
 
 def clean_disease_name(name):
 
-    return str(name).replace(
-        "___",
-        " - "
-    ).replace(
-        "_",
-        " "
+    return (
+        str(name)
+        .replace("___", " - ")
+        .replace("_", " ")
     )
 
 
-# ============================================================
-# DISEASE PREDICTION
-# ============================================================
-
 def predict_disease(image_path):
 
-    print("==============================================")
-    print("Disease prediction requested")
-    print("Image:", image_path)
-    print("==============================================")
-
-
-    # --------------------------------------------------------
-    # CHECK IMAGE
-    # --------------------------------------------------------
-
     if not image_path:
-
-        raise ValueError(
-            "Image path is empty."
-        )
-
+        raise ValueError("No image path provided.")
 
     if not os.path.isfile(image_path):
-
         raise FileNotFoundError(
-            f"Image not found:\n{image_path}"
+            f"Image not found: {image_path}"
         )
 
-
-    # --------------------------------------------------------
-    # LOAD MODEL ONLY NOW
-    # --------------------------------------------------------
-
+    # Load TensorFlow model only when disease detection
+    # is actually requested.
     current_model = get_model()
-
-
-    # --------------------------------------------------------
-    # OPEN IMAGE
-    # --------------------------------------------------------
 
     try:
 
@@ -221,47 +144,22 @@ def predict_disease(image_path):
             f"Unable to open image: {error}"
         )
 
-
-    # --------------------------------------------------------
-    # RESIZE
-    # --------------------------------------------------------
-
     image = image.resize(
         IMAGE_SIZE,
         Image.Resampling.LANCZOS
     )
-
-
-    # --------------------------------------------------------
-    # ARRAY
-    # --------------------------------------------------------
 
     image_array = np.asarray(
         image,
         dtype=np.float32
     )
 
-
-    # --------------------------------------------------------
-    # NORMALIZE
-    # --------------------------------------------------------
-
     image_array = image_array / 255.0
-
-
-    # --------------------------------------------------------
-    # BATCH
-    # --------------------------------------------------------
 
     image_array = np.expand_dims(
         image_array,
         axis=0
     )
-
-
-    # --------------------------------------------------------
-    # PREDICT
-    # --------------------------------------------------------
 
     try:
 
@@ -276,102 +174,64 @@ def predict_disease(image_path):
             f"Disease prediction failed: {error}"
         )
 
-
-    predictions = np.asarray(
-        predictions
-    )
-
-
-    # --------------------------------------------------------
-    # OUTPUT
-    # --------------------------------------------------------
+    predictions = np.asarray(predictions)
 
     if predictions.ndim == 2:
-
         probabilities = predictions[0]
 
     elif predictions.ndim == 1:
-
         probabilities = predictions
 
     else:
-
         raise RuntimeError(
             f"Unexpected prediction shape: {predictions.shape}"
         )
 
-
     if len(probabilities) != len(CLASS_NAMES):
 
         raise RuntimeError(
-            "Model output does not contain "
-            f"{len(CLASS_NAMES)} classes."
+            f"Model has {len(probabilities)} outputs, "
+            f"but {len(CLASS_NAMES)} classes are configured."
         )
 
-
-    # --------------------------------------------------------
-    # HANDLE LOGITS
-    # --------------------------------------------------------
-
-    total = float(
-        np.sum(probabilities)
-    )
-
+    # Make sure probabilities are valid
+    total = float(np.sum(probabilities))
 
     if (
         np.any(probabilities < 0)
-        or
-        np.any(probabilities > 1)
-        or
-        abs(total - 1.0) > 0.05
+        or np.any(probabilities > 1)
+        or abs(total - 1.0) > 0.05
     ):
 
-        exp_values = np.exp(
+        shifted = (
             probabilities -
             np.max(probabilities)
         )
+
+        exp_values = np.exp(shifted)
 
         probabilities = (
             exp_values /
             np.sum(exp_values)
         )
 
-
-    # --------------------------------------------------------
-    # BEST CLASS
-    # --------------------------------------------------------
-
     predicted_index = int(
         np.argmax(probabilities)
     )
-
 
     confidence = float(
         probabilities[predicted_index]
     )
 
-
     disease = CLASS_NAMES[
         predicted_index
     ]
-
-
-    disease_display = clean_disease_name(
-        disease
-    )
-
-
-    # --------------------------------------------------------
-    # TOP 3
-    # --------------------------------------------------------
 
     top_indices = np.argsort(
         probabilities
     )[::-1][:3]
 
-
     top_predictions = []
-
 
     for index in top_indices:
 
@@ -391,18 +251,12 @@ def predict_disease(image_path):
                     ) * 100,
                     2
                 )
-
         })
 
-
-    # --------------------------------------------------------
-    # RESULT
-    # --------------------------------------------------------
-
-    result = {
+    return {
 
         "disease":
-            disease_display,
+            clean_disease_name(disease),
 
         "confidence":
             round(
@@ -418,15 +272,9 @@ def predict_disease(image_path):
 
         "model_status":
             "Real PlantVillage disease model"
-
     }
 
 
-    print("Disease:", disease_display)
-    print(
-        "Confidence:",
-        result["confidence"],
-        "%"
-    )
+def detect_disease(image_path):
 
-    return result
+    return predict_disease(image_path)
