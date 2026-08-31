@@ -1,0 +1,66 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(circle at 10% 10%, rgba(226,170,65,.15), transparent 30%),
+        radial-gradient(circle at 90% 15%, rgba(111,157,76,.12), transparent 28%),
+        linear-gradient(135deg, #fbf8ef, #f5f3e8, #fffdf6);
+    color: #46381f;
+    min-height: 100vh;
+}
+
+.navbar {
+    height: 78px;
+    padding: 0 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,.95);
+    border-bottom: 1px solid rgba(112,87,35,.1);
+    box-shadow: 0 8px 30px rgba(88,68,31,.07);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(18px);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #9c762e, #d8ad4c);
+    color: white;
+    font-size: 23px;
+}
+
+.brand h2 {
+    margin: 0;
+    color: #59441e;
+    font-size: 21px;
+}
+
+.brand span {
+    display: block;
+    color: #92886f;
+    font-size: 10px;
+}
+
+.back-btn {
+    text-decoration: none;
+    padding: 11px 18px;
+    border-radius: 13px;
+    background: #f7f2df
+}

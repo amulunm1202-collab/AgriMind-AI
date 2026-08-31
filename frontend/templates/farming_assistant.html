@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI Farming Assistant | AgriMind AI</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef9f0,
+                    #dff3e4
+                );
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 30px;
+        }
+
+
+        /* ===============================
+           MAIN CONTAINER
+        =============================== */
+
+        .assistant-container {
+
+            width: 100%;
+
+            max-width: 850px;
+
+            height: 650px;
+
+            background: white;
+
+            border-radius: 25px;
+
+            box-shadow:
+                0 15px 45px
+                rgba(0, 80, 30, 0.15);
+
+            overflow: hidden;
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        /* ===============================
+           HEADER
+        =============================== */
+
+        .assistant-header {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #16803a,
+                    #2e9d50
+                );
+
+            color: white;
+
+            padding: 22px 30px 25px;
+        }
+
+
+        .dashboard-btn {
+
+            display: inline-block;
+
+            text-decoration: none;
+
+            color: white;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.16
+                );
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.30
+                );
+
+            padding: 9px 15px;
+
+            border-radius: 10px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 17px;
+
+            transition: 0.2s;
+        }
+
+
+        .dashboard-btn:hover {
+
+            background: white;
+
+            color: #16803a;
+
+            transform:
+                translateX(-2px);
+        }
+
+
+        .assistant-header h1 {
+
+            font-size: 28px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .assistant-header p {
+
+            opacity: 0.9;
+
+            font-size: 15px;
+
+            line-height: 1.5;
+        }
+
+
+        /* ===============================
+           CHAT AREA
+        =============================== */
+
+        .chat-area {
+
+            flex: 1;
+
+            padding: 25px;
+
+            overflow-y: auto;
+
+            background: #f8fcf8;
+        }
+
+
+        .message {
+
+            max-width: 75%;
+
+            padding: 14px 18px;
+
+            border-radius: 18px;
+
+            margin-bottom: 15px;
+
+            line-height: 1.5;
+
+            font-size: 15px;
+
+            word-wrap: break-word;
+        }
+
+
+        .bot-message {
+
+            background: #e5f5e8;
+
+            color: #174d28;
+
+            border-bottom-left-radius: 5px;
+        }
+
+
+        .user-message {
+
+            background: #218c43;
+
+            color: white;
+
+            margin-left: auto;
+
+            border-bottom-right-radius: 5px;
+        }
+
+
+        /* ===============================
+           QUICK ACTIONS
+        =============================== */
+
+        .quick-actions {
+
+            padding:
+                0 20px 15px;
+
+            background: white;
+
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .quick-btn {
+
+            border:
+                1px solid #c9dfcf;
+
+            background: #f1faf3;
+
+            color: #176d33;
+
+            padding: 8px 13px;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            transition: 0.2s;
+        }
+
+
+        .quick-btn:hover {
+
+            background: #dff2e3;
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        /* ===============================
+           INPUT
+        =============================== */
+
+        .input-area {
+
+            padding: 18px;
+
+            background: white;
+
+            border-top:
+                1px solid #e5eee7;
+
+            display: flex;
+
+            gap: 12px;
+        }
+
+
+        .input-area input {
+
+            flex: 1;
+
+            padding:
+                15px 18px;
+
+            border:
+                1px solid #cbded0;
+
+            border-radius: 30px;
+
+            outline: none;
+
+            font-size: 15px;
+        }
+
+
+        .input-area input:focus {
+
+            border-color: #218c43;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(
+                    33,
+                    140,
+                    67,
+                    0.08
+                );
+        }
+
+
+        .send-btn {
+
+            border: none;
+
+            background: #218c43;
+
+            color: white;
+
+            width: 55px;
+
+            height: 55px;
+
+            border-radius: 50%;
+
+            cursor: pointer;
+
+            font-size: 20px;
+
+            transition: 0.2s;
+        }
+
+
+        .send-btn:hover {
+
+            background: #176d33;
+
+            transform:
+                scale(1.05);
+        }
+
+
+        .send-btn:disabled {
+
+            opacity: 0.6;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        /* ===============================
+           TYPING
+        =============================== */
+
+        .typing {
+
+            display: inline-flex;
+
+            gap: 4px;
+
+            align-items: center;
+        }
+
+
+        .typing span {
+
+            width: 7px;
+
+            height: 7px;
+
+            background: #5d8769;
+
+            border-radius: 50%;
+
+            animation:
+                typingAnimation 1.2s
+                infinite;
+        }
+
+
+        .typing span:nth-child(2) {
+
+            animation-delay: 0.2s;
+        }
+
+
+        .typing span:nth-child(3) {
+
+            animation-delay: 0.4s;
+        }
+
+
+        @keyframes typingAnimation {
+
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+
+            30% {
+                transform: translateY(-4px);
+                opacity: 1;
+            }
+        }
+
+
+        /* ===============================
+           MOBILE
+        =============================== */
+
+        @media (max-width: 600px) {
+
+            body {
+
+                padding: 10px;
+            }
+
+
+            .assistant-container {
+
+                height: 90vh;
+
+                border-radius: 18px;
+            }
+
+
+            .assistant-header {
+
+                padding: 18px 20px;
+            }
+
+
+            .assistant-header h1 {
+
+                font-size: 23px;
+            }
+
+
+            .message {
+
+                max-width: 88%;
+            }
+
+
+            .chat-area {
+
+                padding: 18px;
+            }
+
+
+            .quick-actions {
+
+                padding:
+                    0 12px 12px;
+            }
+
+
+            .input-area {
+
+                padding: 12px;
+            }
+
+
+            .input-area input {
+
+                min-width: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="assistant-container">
+
+
+    <!-- ================= HEADER ================= -->
+
+    <div class="assistant-header">
+
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="dashboard-btn"
+        >
+            ← Back to Dashboard
+        </a>
+
+
+        <h1>
+            🌱 AI Farming Assistant
+        </h1>
+
+
+        <p>
+            Ask questions about crops, soil, irrigation,
+            weather and plant diseases.
+        </p>
+
+
+    </div>
+
+
+    <!-- ================= CHAT ================= -->
+
+    <div
+        class="chat-area"
+        id="chatArea"
+    >
+
+
+        <div class="message bot-message">
+
+            👋 Hello! I'm your AgriMind AI Farming Assistant.
+
+            <br><br>
+
+            How can I help you with your farming today?
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ================= QUICK QUESTIONS ================= -->
+
+    <div class="quick-actions">
+
+
+        <button
+            class="quick-btn"
+            onclick="askQuestion(
+                'Which crop is suitable for my soil?'
+            )"
+        >
+            🌾 Crop recommendation
+        </button>
+
+
+        <button
+            class="quick-btn"
+            onclick="askQuestion(
+                'How should I manage irrigation?'
+            )"
+        >
+            💧 Irrigation
+        </button>
+
+
+        <button
+            class="quick-btn"
+            onclick="askQuestion(
+                'How can I check my soil?'
+            )"
+        >
+            🌱 Soil
+        </button>
+
+
+        <button
+            class="quick-btn"
+            onclick="askQuestion(
+                'How can I identify plant diseases?'
+            )"
+        >
+            🍃 Plant disease
+        </button>
+
+
+        <button
+            class="quick-btn"
+            onclick="askQuestion(
+                'What should I consider before irrigation?'
+            )"
+        >
+            ☁️ Weather
+        </button>
+
+
+    </div>
+
+
+    <!-- ================= INPUT ================= -->
+
+    <div class="input-area">
+
+
+        <input
+            type="text"
+            id="messageInput"
+            placeholder="Ask your farming question..."
+            onkeydown="handleEnter(event)"
+        >
+
+
+        <button
+            class="send-btn"
+            id="sendButton"
+            onclick="sendMessage()"
+        >
+            ➤
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================================
+   ADD MESSAGE
+========================================= */
+
+function addMessage(text, type) {
+
+    const chatArea =
+        document.getElementById(
+            "chatArea"
+        );
+
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+
+    message.className =
+        "message " +
+        (
+            type === "user"
+                ? "user-message"
+                : "bot-message"
+        );
+
+
+    message.innerText = text;
+
+
+    chatArea.appendChild(
+        message
+    );
+
+
+    chatArea.scrollTop =
+        chatArea.scrollHeight;
+}
+
+
+/* =========================================
+   TYPING MESSAGE
+========================================= */
+
+function addTypingMessage() {
+
+    const chatArea =
+        document.getElementById(
+            "chatArea"
+        );
+
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+
+    message.className =
+        "message bot-message";
+
+
+    message.id =
+        "typingMessage";
+
+
+    message.innerHTML = `
+        <div class="typing">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
+
+
+    chatArea.appendChild(
+        message
+    );
+
+
+    chatArea.scrollTop =
+        chatArea.scrollHeight;
+}
+
+
+/* =========================================
+   REMOVE TYPING
+========================================= */
+
+function removeTypingMessage() {
+
+    const typing =
+        document.getElementById(
+            "typingMessage"
+        );
+
+
+    if (typing) {
+
+        typing.remove();
+
+    }
+}
+
+
+/* =========================================
+   QUICK QUESTION
+========================================= */
+
+function askQuestion(question) {
+
+    document.getElementById(
+        "messageInput"
+    ).value = question;
+
+
+    sendMessage();
+}
+
+
+/* =========================================
+   ENTER KEY
+========================================= */
+
+function handleEnter(event) {
+
+    if (
+        event.key === "Enter"
+    ) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+}
+
+
+/* =========================================
+   SEND MESSAGE
+========================================= */
+
+async function sendMessage() {
+
+    const input =
+        document.getElementById(
+            "messageInput"
+        );
+
+
+    const sendButton =
+        document.getElementById(
+            "sendButton"
+        );
+
+
+    const message =
+        input.value.trim();
+
+
+    if (!message) {
+
+        return;
+
+    }
+
+
+    /* Show user's message */
+
+    addMessage(
+        message,
+        "user"
+    );
+
+
+    input.value = "";
+
+
+    sendButton.disabled = true;
+
+
+    addTypingMessage();
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/farming-assistant",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            message: message
+                        })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        removeTypingMessage();
+
+
+        if (
+            data.success
+        ) {
+
+
+            addMessage(
+                data.response,
+                "bot"
+            );
+
+
+        } else {
+
+
+            addMessage(
+                data.message ||
+                "Unable to get a response.",
+                "bot"
+            );
+
+        }
+
+
+    } catch (error) {
+
+
+        console.error(
+            error
+        );
+
+
+        removeTypingMessage();
+
+
+        addMessage(
+            "Unable to connect to the farming assistant.",
+            "bot"
+        );
+
+
+    }
+
+
+    sendButton.disabled = false;
+
+
+    input.focus();
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

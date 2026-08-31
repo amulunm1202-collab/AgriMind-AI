@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Irrigation | AgriMind AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/irrigation.css') }}">
+</head>
+
+<body>
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<header class="navbar">
+
+    <a href="/dashboard" class="brand">
+
+        <div class="brand-logo">🌱</div>
+
+        <div>
+            <div class="brand-name">AgriMind AI</div>
+            <div class="brand-subtitle">
+                Smart Farming Assistant
+            </div>
+        </div>
+
+    </a>
+
+    <a href="/dashboard" class="back-btn">
+        ← Dashboard
+    </a>
+
+</header>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="page-container">
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div>
+
+            <div class="eyebrow">
+                SMART WATER MANAGEMENT
+            </div>
+
+            <h1>
+                Smart <span>Irrigation</span>
+            </h1>
+
+            <p>
+                Make smarter irrigation decisions using live weather,
+                rainfall, soil moisture and crop water requirements.
+            </p>
+
+        </div>
+
+        <div class="hero-icon">
+            💧
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INPUT + WEATHER
+    ====================================================== -->
+
+    <section class="top-grid">
+
+
+        <!-- FIELD CARD -->
+
+        <div class="card field-card">
+
+            <div class="card-heading">
+
+                <div class="heading-icon">
+                    🌱
+                </div>
+
+                <div>
+                    <h2>Field Analysis</h2>
+                    <p>Tell us about your crop</p>
+                </div>
+
+            </div>
+
+
+            <label class="input-label">
+                FIELD CROP
+            </label>
+
+            <div class="crop-input-wrapper">
+
+                <span>🌱</span>
+
+                <input
+                    type="text"
+                    id="cropInput"
+                    placeholder="Enter crop name"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="suggestions">
+
+                <button type="button" data-crop="Rice">
+                    Rice
+                </button>
+
+                <button type="button" data-crop="Wheat">
+                    Wheat
+                </button>
+
+                <button type="button" data-crop="Maize">
+                    Maize
+                </button>
+
+                <button type="button" data-crop="Ragi">
+                    Ragi
+                </button>
+
+                <button type="button" data-crop="Tomato">
+                    Tomato
+                </button>
+
+            </div>
+
+
+            <div class="location-box">
+
+                <div class="location-icon">
+                    📍
+                </div>
+
+                <div class="location-info">
+
+                    <span>LIVE LOCATION</span>
+
+                    <strong id="locationStatus">
+                        Detecting location...
+                    </strong>
+
+                </div>
+
+                <div
+                    class="location-dot"
+                    id="locationDot">
+                </div>
+
+            </div>
+
+
+            <button
+                id="assessBtn"
+                class="assess-btn">
+
+                <span>💧</span>
+
+                <span>Assess Irrigation</span>
+
+                <span>→</span>
+
+            </button>
+
+
+            <div
+                class="error-message"
+                id="errorMessage">
+            </div>
+
+        </div>
+
+
+
+        <!-- WEATHER CARD -->
+
+        <div class="card weather-card">
+
+            <div class="card-heading">
+
+                <div class="heading-icon weather-icon">
+                    ☀️
+                </div>
+
+                <div>
+
+                    <h2>Live Environment</h2>
+
+                    <p>
+                        Current conditions at your location
+                    </p>
+
+                </div>
+
+                <div class="live-badge">
+                    <i></i>
+                    LIVE
+                </div>
+
+            </div>
+
+
+            <div class="weather-grid">
+
+
+                <div class="weather-item">
+
+                    <div class="weather-symbol">
+                        🌡️
+                    </div>
+
+                    <div class="weather-label">
+                        TEMPERATURE
+                    </div>
+
+                    <div
+                        class="weather-value"
+                        id="temperature">
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <div class="weather-symbol">
+                        💧
+                    </div>
+
+                    <div class="weather-label">
+                        HUMIDITY
+                    </div>
+
+                    <div
+                        class="weather-value"
+                        id="humidity">
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <div class="weather-symbol">
+                        🌧️
+                    </div>
+
+                    <div class="weather-label">
+                        CURRENT RAIN
+                    </div>
+
+                    <div
+                        class="weather-value"
+                        id="currentRain">
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <div class="weather-symbol">
+                        ☔
+                    </div>
+
+                    <div class="weather-label">
+                        FORECAST RAIN
+                    </div>
+
+                    <div
+                        class="weather-value"
+                        id="expectedRain">
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="weather-item wide">
+
+                    <div class="weather-symbol">
+                        🌦️
+                    </div>
+
+                    <div>
+
+                        <div class="weather-label">
+                            RAIN PROBABILITY
+                        </div>
+
+                        <div
+                            class="weather-value"
+                            id="rainProbability">
+                            --
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         RESULT
+    ====================================================== -->
+
+    <section
+        class="result-card hidden"
+        id="resultCard">
+
+
+        <div class="result-header">
+
+            <div>
+
+                <div class="eyebrow">
+                    AI IRRIGATION DECISION
+                </div>
+
+                <h2 id="resultStatus">
+                    Irrigation Assessment
+                </h2>
+
+            </div>
+
+
+            <div
+                class="result-badge"
+                id="resultBadge">
+                MONITOR FIELD
+            </div>
+
+        </div>
+
+
+        <div class="result-message"
+             id="resultMessage">
+
+            --
+
+        </div>
+
+
+        <!-- METRICS -->
+
+        <div class="metric-grid">
+
+
+            <div class="metric">
+
+                <span class="metric-icon">
+                    ☔
+                </span>
+
+                <div>
+
+                    <small>
+                        FORECAST RAIN
+                    </small>
+
+                    <strong id="resultRain">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="metric">
+
+                <span class="metric-icon">
+                    🌱
+                </span>
+
+                <div>
+
+                    <small>
+                        SOIL MOISTURE
+                    </small>
+
+                    <strong id="resultSoil">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="metric">
+
+                <span class="metric-icon">
+                    💨
+                </span>
+
+                <div>
+
+                    <small>
+                        EVAPOTRANSPIRATION
+                    </small>
+
+                    <strong id="resultET">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="metric">
+
+                <span class="metric-icon">
+                    🌾
+                </span>
+
+                <div>
+
+                    <small>
+                        CROP WATER NEED
+                    </small>
+
+                    <strong
+                        id="resultRequirement">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ANALYSIS -->
+
+        <div class="analysis-section">
+
+            <h3>
+                Why this decision?
+            </h3>
+
+            <div
+                id="analysisList"
+                class="analysis-list">
+            </div>
+
+        </div>
+
+
+        <!-- TIP -->
+
+        <div class="tip-box">
+
+            <span>💡</span>
+
+            <div>
+
+                <strong>Smart farming tip</strong>
+
+                <p id="resultTip">
+                    --
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="source">
+            🌐 Live weather source: Open-Meteo
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         EMPTY STATE
+    ====================================================== -->
+
+    <section
+        class="empty-state"
+        id="emptyState">
+
+        <div class="empty-icon">
+            💧
+        </div>
+
+        <h3>
+            Ready to analyze your field
+        </h3>
+
+        <p>
+            Select your crop and allow location access.
+            AgriMind AI will analyze the live conditions
+            and provide an irrigation recommendation.
+        </p>
+
+    </section>
+
+</main>
+
+
+<script src="{{ url_for('static', filename='js/irrigation.js') }}"></script>
+
+</body>
+</html>

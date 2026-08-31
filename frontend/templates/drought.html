@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Drought Risk | AgriMind AI</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/drought.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="drought-page">
+
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
+
+    <nav class="drought-navbar">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="drought-brand"
+        >
+
+            <div class="drought-brand-icon">
+                🌱
+            </div>
+
+            <div class="drought-brand-text">
+
+                <div class="drought-brand-title">
+                    AgriMind AI
+                </div>
+
+                <div class="drought-brand-subtitle">
+                    Smart Farming Assistant
+                </div>
+
+            </div>
+
+        </a>
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="drought-back"
+        >
+            ← Dashboard
+        </a>
+
+    </nav>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="drought-hero">
+
+        <div class="drought-hero-content">
+
+            <div class="drought-eyebrow">
+                DROUGHT INTELLIGENCE
+            </div>
+
+            <h1>
+                Drought
+                <span>Risk</span>
+                Assessment
+            </h1>
+
+            <p class="drought-description">
+
+                Analyze live weather conditions, recent rainfall,
+                soil moisture, temperature and atmospheric water
+                demand to understand the drought-risk signal for
+                your crop.
+
+            </p>
+
+        </div>
+
+
+        <div class="drought-hero-card">
+
+            <div class="drought-hero-icon">
+                🌾
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="drought-container">
+
+
+        <!-- =================================================
+             FARM INPUT
+        ================================================== -->
+
+        <section class="drought-card">
+
+            <div class="drought-card-header">
+
+                <div class="drought-card-icon">
+                    🌱
+                </div>
+
+                <div>
+
+                    <h2 class="drought-card-title">
+                        Field Analysis
+                    </h2>
+
+                    <p class="drought-card-subtitle">
+                        Enter your crop and analyze the field
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form id="droughtForm">
+
+                <div class="drought-form-group">
+
+                    <label
+                        class="drought-label"
+                        for="crop"
+                    >
+                        Field Crop
+                    </label>
+
+                    <input
+                        id="crop"
+                        name="crop"
+                        class="drought-input"
+                        type="text"
+                        placeholder="Enter crop name"
+                        autocomplete="off"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="drought-form-group">
+
+                    <label class="drought-label">
+                        Farm Location
+                    </label>
+
+                    <div class="drought-location">
+
+                        <div class="drought-location-icon">
+                            📍
+                        </div>
+
+                        <div class="drought-location-text">
+
+                            <span class="drought-location-title">
+                                LIVE LOCATION
+                            </span>
+
+                            <span
+                                id="locationStatus"
+                                class="drought-location-status"
+                            >
+                                Requesting location permission...
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    id="analyzeButton"
+                    class="drought-button"
+                >
+
+                    Analyze Drought Risk →
+
+                </button>
+
+
+                <div
+                    id="loading"
+                    class="drought-loading"
+                >
+
+                    <span class="drought-spinner"></span>
+
+                    Analyzing live weather...
+
+                </div>
+
+
+                <div
+                    id="error"
+                    class="drought-error"
+                ></div>
+
+            </form>
+
+        </section>
+
+
+        <!-- =================================================
+             LIVE WEATHER
+        ================================================== -->
+
+        <section class="drought-card drought-weather">
+
+            <div class="drought-card-header">
+
+                <div class="drought-card-icon">
+                    🌦️
+                </div>
+
+                <div>
+
+                    <h2 class="drought-card-title">
+                        Live Environment
+                    </h2>
+
+                    <p class="drought-card-subtitle">
+                        Current conditions at your location
+                    </p>
+
+                </div>
+
+                <div class="drought-live">
+                    LIVE
+                </div>
+
+            </div>
+
+
+            <div class="drought-weather-grid">
+
+
+                <div class="drought-weather-item">
+
+                    <div class="drought-weather-icon">
+                        🌡️
+                    </div>
+
+                    <div class="drought-weather-label">
+                        TEMPERATURE
+                    </div>
+
+                    <div
+                        id="temperature"
+                        class="drought-weather-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="drought-weather-item">
+
+                    <div class="drought-weather-icon">
+                        💧
+                    </div>
+
+                    <div class="drought-weather-label">
+                        HUMIDITY
+                    </div>
+
+                    <div
+                        id="humidity"
+                        class="drought-weather-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="drought-weather-item">
+
+                    <div class="drought-weather-icon">
+                        🌧️
+                    </div>
+
+                    <div class="drought-weather-label">
+                        CURRENT RAIN
+                    </div>
+
+                    <div
+                        id="currentRain"
+                        class="drought-weather-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="drought-weather-item">
+
+                    <div class="drought-weather-icon">
+                        🌱
+                    </div>
+
+                    <div class="drought-weather-label">
+                        SELECTED CROP
+                    </div>
+
+                    <div
+                        id="selectedCrop"
+                        class="drought-weather-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         RESULT
+    ====================================================== -->
+
+    <section
+        id="result"
+        class="drought-result"
+    >
+
+        <div class="drought-result-main">
+
+
+            <!-- SCORE -->
+
+            <div class="drought-score-card">
+
+                <div class="drought-score-label">
+                    DROUGHT RISK SCORE
+                </div>
+
+                <div class="drought-score">
+                    <span id="score">
+                        --
+                    </span>
+                    <span>/100</span>
+                </div>
+
+                <div
+                    id="riskName"
+                    class="drought-risk-name"
+                >
+                    --
+                </div>
+
+                <p
+                    id="message"
+                    class="drought-score-message"
+                >
+                    --
+                </p>
+
+            </div>
+
+
+            <!-- ANALYSIS -->
+
+            <div class="drought-analysis-card">
+
+                <h2 class="drought-analysis-title">
+                    AI Field Analysis
+                </h2>
+
+                <ul
+                    id="analysisList"
+                    class="drought-analysis-list"
+                ></ul>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             METRICS
+        ================================================== -->
+
+        <div class="drought-metrics">
+
+
+            <div class="drought-metric">
+
+                <div class="drought-metric-label">
+                    7-DAY RAINFALL
+                </div>
+
+                <div
+                    id="rainfall7"
+                    class="drought-metric-value"
+                >
+                    --
+                </div>
+
+            </div>
+
+
+            <div class="drought-metric">
+
+                <div class="drought-metric-label">
+                    30-DAY RAINFALL
+                </div>
+
+                <div
+                    id="rainfall30"
+                    class="drought-metric-value"
+                >
+                    --
+                </div>
+
+            </div>
+
+
+            <div class="drought-metric">
+
+                <div class="drought-metric-label">
+                    SOIL MOISTURE
+                </div>
+
+                <div
+                    id="soilMoisture"
+                    class="drought-metric-value"
+                >
+                    --
+                </div>
+
+            </div>
+
+
+            <div class="drought-metric">
+
+                <div class="drought-metric-label">
+                    MAX TEMPERATURE
+                </div>
+
+                <div
+                    id="maxTemperature"
+                    class="drought-metric-value"
+                >
+                    --
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/drought.js') }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Disease Intelligence | AgriMind AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        }
+
+        /* =====================================================
+           PAGE
+        ===================================================== */
+
+        .disease-page {
+            min-height: 100vh;
+
+            color: #183b25;
+
+            background:
+                radial-gradient(
+                    circle at 8% 8%,
+                    rgba(71, 178, 91, 0.18),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 92% 12%,
+                    rgba(255, 196, 76, 0.16),
+                    transparent 25%
+                ),
+                linear-gradient(
+                    135deg,
+                    #f4faf2 0%,
+                    #edf7ec 48%,
+                    #f9fcf5 100%
+                );
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .disease-navbar {
+            height: 78px;
+
+            padding: 0 6%;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: rgba(255, 255, 255, 0.94);
+
+            border-bottom:
+                1px solid rgba(38, 105, 53, 0.10);
+
+            box-shadow:
+                0 8px 30px rgba(30, 83, 43, 0.07);
+
+            position: sticky;
+            top: 0;
+
+            z-index: 100;
+
+            backdrop-filter: blur(18px);
+        }
+
+
+        .disease-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+
+        .disease-brand-icon {
+            width: 46px;
+            height: 46px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #218a42,
+                    #73c965
+                );
+
+            color: white;
+
+            font-size: 23px;
+
+            box-shadow:
+                0 9px 22px rgba(42, 143, 70, 0.25);
+        }
+
+
+        .disease-brand h2 {
+            margin: 0;
+
+            color: #174b28;
+
+            font-size: 21px;
+
+            font-weight: 850;
+
+            letter-spacing: -0.4px;
+        }
+
+
+        .disease-brand span {
+            display: block;
+
+            margin-top: 2px;
+
+            color: #789181;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.3px;
+        }
+
+
+        .disease-back-btn {
+            border: 1px solid #dcecdf;
+
+            padding: 11px 18px;
+
+            border-radius: 13px;
+
+            background: #f0f8f1;
+
+            color: #24683a;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+        }
+
+
+        .disease-back-btn:hover {
+            background: #dcefdc;
+
+            transform: translateY(-2px);
+        }
+
+
+        /* =====================================================
+           CONTAINER
+        ===================================================== */
+
+        .disease-container {
+            width: min(1120px, 91%);
+
+            margin: auto;
+
+            padding: 55px 0 80px;
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .disease-header {
+            text-align: center;
+
+            max-width: 800px;
+
+            margin: 0 auto 42px;
+        }
+
+
+        .disease-eyebrow {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 8px 15px;
+
+            border-radius: 999px;
+
+            background: #e1f4e4;
+
+            color: #27743d;
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .disease-header h1 {
+            margin: 18px 0 14px;
+
+            font-size: clamp(40px, 5vw, 59px);
+
+            line-height: 1.03;
+
+            letter-spacing: -2.8px;
+
+            color: #153e22;
+        }
+
+
+        .disease-header h1 strong {
+            color: #319b4e;
+        }
+
+
+        .disease-header p {
+            max-width: 670px;
+
+            margin: auto;
+
+            color: #6d8474;
+
+            line-height: 1.8;
+
+            font-size: 15px;
+        }
+
+
+        /* =====================================================
+           MAIN GRID
+        ===================================================== */
+
+        .disease-main-grid {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 22px;
+
+            align-items: stretch;
+        }
+
+
+        /* =====================================================
+           UPLOAD CARD
+        ===================================================== */
+
+        .disease-upload-card {
+            padding: 30px;
+
+            background:
+                rgba(255, 255, 255, 0.95);
+
+            border:
+                1px solid rgba(47, 115, 63, 0.10);
+
+            border-radius: 28px;
+
+            box-shadow:
+                0 18px 55px rgba(31, 87, 43, 0.08);
+        }
+
+
+        .card-label {
+            color: #5b9b68;
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .disease-upload-card h2 {
+            margin: 7px 0 7px;
+
+            color: #214d2c;
+
+            font-size: 25px;
+
+            letter-spacing: -0.5px;
+        }
+
+
+        .disease-upload-card > p {
+            margin: 0 0 22px;
+
+            color: #78917e;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           UPLOAD AREA
+        ===================================================== */
+
+        .upload-zone {
+            min-height: 275px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 25px;
+
+            border-radius: 23px;
+
+            border:
+                2px dashed #cde4cf;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #f8fcf7,
+                    #eff8ef
+                );
+
+            cursor: pointer;
+
+            transition: 0.28s;
+        }
+
+
+        .upload-zone:hover {
+            border-color: #63af70;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #f1faf2,
+                    #e9f6ea
+                );
+
+            transform: translateY(-2px);
+        }
+
+
+        .upload-zone.has-image {
+            border-style: solid;
+
+            border-color: #9bcea2;
+        }
+
+
+        .upload-content {
+            width: 100%;
+        }
+
+
+        .upload-icon {
+            width: 72px;
+            height: 72px;
+
+            margin: 0 auto 16px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 23px;
+
+            background: #e2f4e4;
+
+            font-size: 34px;
+        }
+
+
+        .upload-zone h3 {
+            margin: 0 0 7px;
+
+            color: #285d34;
+
+            font-size: 18px;
+        }
+
+
+        .upload-zone p {
+            margin: 0;
+
+            color: #829488;
+
+            font-size: 12px;
+        }
+
+
+        .upload-formats {
+            margin-top: 14px;
+
+            color: #a0aea4;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* =====================================================
+           IMAGE PREVIEW
+        ===================================================== */
+
+        #imagePreview {
+            display: none;
+
+            max-width: 100%;
+
+            max-height: 240px;
+
+            margin: auto;
+
+            border-radius: 19px;
+
+            object-fit: contain;
+
+            box-shadow:
+                0 12px 30px rgba(29, 87, 43, 0.12);
+        }
+
+
+        /* =====================================================
+           BUTTON
+        ===================================================== */
+
+        .analyze-button {
+            width: 100%;
+
+            margin-top: 17px;
+
+            border: none;
+
+            padding: 16px 20px;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #218642,
+                    #3ba656
+                );
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: 850;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 10px 25px rgba(39, 132, 64, 0.20);
+
+            transition: 0.25s;
+        }
+
+
+        .analyze-button:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 14px 30px rgba(39, 132, 64, 0.26);
+        }
+
+
+        .analyze-button:disabled {
+            opacity: 0.55;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        /* =====================================================
+           RESULT CARD
+        ===================================================== */
+
+        .disease-result-card {
+            padding: 30px;
+
+            background:
+                rgba(255, 255, 255, 0.95);
+
+            border:
+                1px solid rgba(47, 115, 63, 0.10);
+
+            border-radius: 28px;
+
+            box-shadow:
+                0 18px 55px rgba(31, 87, 43, 0.08);
+        }
+
+
+        .result-placeholder {
+            min-height: 345px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 25px;
+        }
+
+
+        .result-placeholder-icon {
+            width: 78px;
+            height: 78px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 25px;
+
+            background: #e5f5e6;
+
+            font-size: 34px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .result-placeholder h2 {
+            margin: 0 0 8px;
+
+            color: #214d2c;
+
+            font-size: 22px;
+        }
+
+
+        .result-placeholder p {
+            max-width: 350px;
+
+            margin: 0;
+
+            color: #829488;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           RESULT CONTENT
+        ===================================================== */
+
+        #diseaseResult {
+            display: none;
+        }
+
+
+        .result-label {
+            color: #5b9b68;
+
+            font-size: 9px;
+
+            font-weight: 900;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .result-title {
+            margin: 7px 0 20px;
+
+            color: #214d2c;
+
+            font-size: 27px;
+
+            letter-spacing: -0.6px;
+        }
+
+
+        .diagnosis-box {
+            display: flex;
+
+            align-items: center;
+
+            gap: 17px;
+
+            padding: 21px;
+
+            margin-bottom: 15px;
+
+            border-radius: 21px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e8f7e9,
+                    #f7fbef
+                );
+
+            border: 1px solid #d5ead7;
+        }
+
+
+        .diagnosis-icon {
+            width: 57px;
+            height: 57px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #32994d,
+                    #8ccc6d
+                );
+
+            font-size: 27px;
+        }
+
+
+        .diagnosis-info small {
+            display: block;
+
+            color: #6b9773;
+
+            font-size: 8px;
+
+            font-weight: 900;
+
+            letter-spacing: 1px;
+        }
+
+
+        .diagnosis-info h2 {
+            margin: 5px 0 0;
+
+            color: #195328;
+
+            font-size: 24px;
+        }
+
+
+        .confidence-box {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 18px 20px;
+
+            margin-bottom: 15px;
+
+            border-radius: 19px;
+
+            background: #fafcf9;
+
+            border: 1px solid #e3eee3;
+        }
+
+
+        .confidence-box span {
+            color: #829488;
+
+            font-size: 9px;
+
+            font-weight: 900;
+
+            letter-spacing: 1px;
+        }
+
+
+        .confidence-box strong {
+            color: #278544;
+
+            font-size: 25px;
+        }
+
+
+        .result-info {
+            padding: 19px;
+
+            margin-bottom: 12px;
+
+            border-radius: 18px;
+
+            background: #fafcf9;
+
+            border: 1px solid #e3eee3;
+        }
+
+
+        .result-info h3 {
+            margin: 0 0 7px;
+
+            color: #285d34;
+
+            font-size: 14px;
+        }
+
+
+        .result-info p {
+            margin: 0;
+
+            color: #718777;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        .disease-error {
+            display: none;
+
+            margin-top: 14px;
+
+            padding: 14px 17px;
+
+            border-radius: 13px;
+
+            background: #fff1f0;
+
+            border: 1px solid #f1d4d1;
+
+            color: #9b423c;
+
+            font-size: 12px;
+
+            text-align: center;
+        }
+
+
+        /* =====================================================
+           TIPS
+        ===================================================== */
+
+        .tips-section {
+            margin-top: 24px;
+
+            padding: 28px;
+
+            border-radius: 27px;
+
+            background:
+                rgba(255, 255, 255, 0.94);
+
+            border: 1px solid rgba(47, 115, 63, 0.10);
+
+            box-shadow:
+                0 18px 50px rgba(31, 87, 43, 0.07);
+        }
+
+
+        .tips-heading {
+            margin-bottom: 20px;
+        }
+
+
+        .tips-heading span {
+            color: #5b9b68;
+
+            font-size: 9px;
+
+            font-weight: 900;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .tips-heading h2 {
+            margin: 6px 0 0;
+
+            color: #214d2c;
+
+            font-size: 22px;
+        }
+
+
+        .tips-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 14px;
+        }
+
+
+        .tip-card {
+            padding: 20px;
+
+            border-radius: 19px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #f8fcf7,
+                    #eff8ef
+                );
+
+            border: 1px solid #deecdf;
+        }
+
+
+        .tip-icon {
+            width: 43px;
+            height: 43px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 13px;
+
+            background: #e3f4e4;
+
+            font-size: 21px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .tip-card h3 {
+            margin: 0 0 5px;
+
+            color: #285d34;
+
+            font-size: 14px;
+        }
+
+
+        .tip-card p {
+            margin: 0;
+
+            color: #829488;
+
+            font-size: 11px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 800px) {
+
+            .disease-main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .disease-container {
+                width: 92%;
+
+                padding-top: 38px;
+            }
+
+            .disease-navbar {
+                padding: 0 4%;
+            }
+
+            .disease-brand h2 {
+                font-size: 18px;
+            }
+
+            .disease-brand span {
+                display: none;
+            }
+
+            .disease-header h1 {
+                font-size: 40px;
+
+                letter-spacing: -1.8px;
+            }
+
+            .disease-upload-card,
+            .disease-result-card,
+            .tips-section {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body class="disease-page">
+
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<header class="disease-navbar">
+
+    <div class="disease-brand">
+
+        <div class="disease-brand-icon">
+            🌿
+        </div>
+
+        <div>
+
+            <h2>AgriMind AI</h2>
+
+            <span>
+                Smart Farming Assistant
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="disease-back-btn"
+        onclick="window.location.href='/dashboard'"
+    >
+        ← Dashboard
+    </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="disease-container">
+
+
+    <!-- =================================================
+         HERO
+    ================================================= -->
+
+    <section class="disease-header">
+
+        <span class="disease-eyebrow">
+            ✨ AI PLANT HEALTH
+        </span>
+
+        <h1>
+            Detect Plant
+            <strong>Diseases Early.</strong>
+        </h1>
+
+        <p>
+            Upload a clear image of a plant leaf and
+            let AgriMind AI analyze it for possible
+            diseases and provide useful guidance.
+        </p>
+
+    </section>
+
+
+    <!-- =================================================
+         MAIN GRID
+    ================================================= -->
+
+    <section class="disease-main-grid">
+
+
+        <!-- =================================================
+             UPLOAD
+        ================================================= -->
+
+        <div class="disease-upload-card">
+
+            <span class="card-label">
+                IMAGE ANALYSIS
+            </span>
+
+            <h2>
+                Analyze Your Leaf
+            </h2>
+
+            <p>
+                Upload a clear image of the affected
+                plant leaf for AI analysis.
+            </p>
+
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                hidden
+            >
+
+
+            <div
+                class="upload-zone"
+                id="uploadZone"
+            >
+
+                <div class="upload-content">
+
+                    <div
+                        class="upload-icon"
+                        id="uploadIcon"
+                    >
+                        📷
+                    </div>
+
+
+                    <img
+                        id="imagePreview"
+                        alt="Selected leaf preview"
+                    >
+
+
+                    <div id="uploadText">
+
+                        <h3>
+                            Upload Leaf Image
+                        </h3>
+
+                        <p>
+                            Click here to choose an image
+                        </p>
+
+                        <div class="upload-formats">
+                            JPG • JPEG • PNG • WEBP
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="analyzeButton"
+                class="analyze-button"
+                disabled
+            >
+                🔍 Analyze Leaf
+            </button>
+
+
+            <div
+                id="diseaseError"
+                class="disease-error"
+            ></div>
+
+        </div>
+
+
+        <!-- =================================================
+             RESULT
+        ================================================= -->
+
+        <div class="disease-result-card">
+
+
+            <!-- PLACEHOLDER -->
+
+            <div
+                id="resultPlaceholder"
+                class="result-placeholder"
+            >
+
+                <div class="result-placeholder-icon">
+                    🦠
+                </div>
+
+                <h2>
+                    Your Result Will Appear Here
+                </h2>
+
+                <p>
+                    Upload a leaf image and click
+                    <b>Analyze Leaf</b> to get the
+                    AI prediction.
+                </p>
+
+            </div>
+
+
+            <!-- RESULT -->
+
+            <div id="diseaseResult">
+
+                <span class="result-label">
+                    ✨ AI DIAGNOSIS
+                </span>
+
+                <h2 class="result-title">
+                    Plant Health Analysis
+                </h2>
+
+
+                <div class="diagnosis-box">
+
+                    <div class="diagnosis-icon">
+                        🌿
+                    </div>
+
+                    <div class="diagnosis-info">
+
+                        <small>
+                            DETECTED CONDITION
+                        </small>
+
+                        <h2 id="diseaseName">
+                            --
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="confidence-box">
+
+                    <span>
+                        AI CONFIDENCE
+                    </span>
+
+                    <strong id="diseaseConfidence">
+                        --%
+                    </strong>
+
+                </div>
+
+
+                <div class="result-info">
+
+                    <h3>
+                        🔍 Analysis
+                    </h3>
+
+                    <p id="diseaseDescription">
+                        --
+                    </p>
+
+                </div>
+
+
+                <div class="result-info">
+
+                    <h3>
+                        🛡️ Recommended Action
+                    </h3>
+
+                    <p id="diseaseTreatment">
+                        --
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         TIPS
+    ================================================= -->
+
+    <section class="tips-section">
+
+        <div class="tips-heading">
+
+            <span>
+                BETTER RESULTS
+            </span>
+
+            <h2>
+                📸 Tips for Better Detection
+            </h2>
+
+        </div>
+
+
+        <div class="tips-grid">
+
+
+            <div class="tip-card">
+
+                <div class="tip-icon">
+                    ☀️
+                </div>
+
+                <h3>
+                    Good Lighting
+                </h3>
+
+                <p>
+                    Take the photo in clear,
+                    natural lighting so the leaf
+                    symptoms are visible.
+                </p>
+
+            </div>
+
+
+            <div class="tip-card">
+
+                <div class="tip-icon">
+                    🍃
+                </div>
+
+                <h3>
+                    Clear Leaf
+                </h3>
+
+                <p>
+                    Make sure the affected leaf
+                    is clearly visible and fills
+                    most of the image.
+                </p>
+
+            </div>
+
+
+            <div class="tip-card">
+
+                <div class="tip-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Avoid Blur
+                </h3>
+
+                <p>
+                    Keep your camera steady and
+                    avoid blurry or very dark
+                    images.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const imageInput =
+    document.getElementById("imageInput");
+
+const uploadZone =
+    document.getElementById("uploadZone");
+
+const analyzeButton =
+    document.getElementById("analyzeButton");
+
+const imagePreview =
+    document.getElementById("imagePreview");
+
+const uploadText =
+    document.getElementById("uploadText");
+
+const uploadIcon =
+    document.getElementById("uploadIcon");
+
+const diseaseError =
+    document.getElementById("diseaseError");
+
+const resultPlaceholder =
+    document.getElementById("resultPlaceholder");
+
+const diseaseResult =
+    document.getElementById("diseaseResult");
+
+
+let selectedImage = null;
+
+
+/* =========================================================
+   OPEN FILE SELECTOR
+========================================================= */
+
+uploadZone.addEventListener(
+    "click",
+    function () {
+
+        imageInput.click();
+
+    }
+);
+
+
+/* =========================================================
+   IMAGE SELECTED
+========================================================= */
+
+imageInput.addEventListener(
+    "change",
+    function () {
+
+        const file =
+            this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+
+        selectedImage = file;
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function (event) {
+
+                imagePreview.src =
+                    event.target.result;
+
+                imagePreview.style.display =
+                    "block";
+
+
+                uploadText.style.display =
+                    "none";
+
+
+                uploadIcon.style.display =
+                    "none";
+
+
+                uploadZone.classList.add(
+                    "has-image"
+                );
+
+
+                analyzeButton.disabled =
+                    false;
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* =========================================================
+   SHOW ERROR
+========================================================= */
+
+function showError(message) {
+
+    diseaseError.textContent =
+        message;
+
+    diseaseError.style.display =
+        "block";
+
+}
+
+
+/* =========================================================
+   HIDE ERROR
+========================================================= */
+
+function hideError() {
+
+    diseaseError.style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   ANALYZE
+========================================================= */
+
+analyzeButton.addEventListener(
+    "click",
+    async function () {
+
+        if (!selectedImage) {
+
+            showError(
+                "Please select a leaf image first."
+            );
+
+            return;
+        }
+
+
+        hideError();
+
+
+        analyzeButton.disabled =
+            true;
+
+        analyzeButton.textContent =
+            "⏳ Analyzing...";
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "image",
+            selectedImage
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/predict-disease",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+                    data.error ||
+                    "Disease detection failed."
+                );
+
+            }
+
+
+            displayDiseaseResult(
+                data.result
+            );
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Disease detection error:",
+                error
+            );
+
+
+            showError(
+                error.message ||
+                "Unable to analyze the image."
+            );
+
+        }
+
+
+        finally {
+
+            analyzeButton.disabled =
+                false;
+
+            analyzeButton.textContent =
+                "🔍 Analyze Leaf";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   DISPLAY RESULT
+========================================================= */
+
+function displayDiseaseResult(result) {
+
+    resultPlaceholder.style.display =
+        "none";
+
+
+    diseaseResult.style.display =
+        "block";
+
+
+    /*
+     * Supports different possible
+     * response formats from the
+     * existing disease model.
+     */
+
+    let disease =
+        "--";
+
+    let confidence =
+        "--";
+
+    let description =
+        "The AI model has analyzed the uploaded image.";
+
+    let treatment =
+        "Follow appropriate agricultural guidance based on the detected condition.";
+
+
+    if (typeof result === "string") {
+
+        disease =
+            result;
+
+    }
+
+
+    else if (result && typeof result === "object") {
+
+        disease =
+            result.disease ||
+            result.prediction ||
+            result.label ||
+            result.class_name ||
+            result.name ||
+            "--";
+
+
+        confidence =
+            result.confidence ||
+            result.score ||
+            "--";
+
+
+        description =
+            result.description ||
+            result.symptoms ||
+            result.message ||
+            description;
+
+
+        treatment =
+            result.treatment ||
+            result.recommendation ||
+            result.solution ||
+            result.control ||
+            treatment;
+
+    }
+
+
+    /* =====================================================
+       CONFIDENCE
+    ===================================================== */
+
+    if (
+        typeof confidence === "number"
+    ) {
+
+        if (confidence <= 1) {
+
+            confidence *= 100;
+
+        }
+
+        confidence =
+            confidence.toFixed(1) + "%";
+
+    }
+
+    else if (
+        typeof confidence === "string" &&
+        confidence &&
+        !confidence.includes("%")
+    ) {
+
+        const number =
+            Number(confidence);
+
+        if (!isNaN(number)) {
+
+            if (number <= 1) {
+                confidence =
+                    (number * 100).toFixed(1) + "%";
+            }
+
+            else {
+                confidence =
+                    number.toFixed(1) + "%";
+            }
+
+        }
+
+    }
+
+
+    document.getElementById(
+        "diseaseName"
+    ).textContent =
+        disease;
+
+
+    document.getElementById(
+        "diseaseConfidence"
+    ).textContent =
+        confidence;
+
+
+    document.getElementById(
+        "diseaseDescription"
+    ).textContent =
+        description;
+
+
+    document.getElementById(
+        "diseaseTreatment"
+    ).textContent =
+        treatment;
+
+
+    diseaseResult.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+}
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Crop Recommendation | AgriMind AI</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef8ed,
+                    #f8fbf6
+                );
+
+            color: #123c2d;
+
+            min-height: 100vh;
+        }
+
+
+        .page {
+
+            width: 100%;
+
+            max-width: 1000px;
+
+            margin: auto;
+
+            padding:
+                30px
+                22px
+                60px;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            margin-bottom: 35px;
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+        }
+
+
+        .brand-icon {
+
+            width: 52px;
+
+            height: 52px;
+
+            border-radius: 16px;
+
+            background: #dff5e4;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 28px;
+        }
+
+
+        .brand h2 {
+
+            font-size: 22px;
+        }
+
+
+        .brand p {
+
+            color: #71877d;
+
+            font-size: 13px;
+
+            margin-top: 4px;
+        }
+
+
+        .dashboard-btn {
+
+            text-decoration: none;
+
+            color: #174d3a;
+
+            background: white;
+
+            padding:
+                12px
+                18px;
+
+            border-radius: 12px;
+
+            font-weight: 600;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0,0,0,0.06);
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+
+        .hero-icon {
+
+            font-size: 50px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .hero h1 {
+
+            font-size: 38px;
+
+            color: #063d2c;
+
+            margin-bottom: 12px;
+        }
+
+
+        .hero p {
+
+            color: #687d73;
+
+            font-size: 17px;
+        }
+
+
+        /* =====================================================
+           CARD
+        ===================================================== */
+
+        .card {
+
+            background:
+                rgba(255,255,255,0.95);
+
+            border-radius: 25px;
+
+            padding: 32px;
+
+            box-shadow:
+                0 15px 50px
+                rgba(32,75,45,0.10);
+        }
+
+
+        .section-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .section-icon {
+
+            width: 46px;
+
+            height: 46px;
+
+            border-radius: 14px;
+
+            background: #dff6e5;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 25px;
+        }
+
+
+        .section-title h2 {
+
+            font-size: 24px;
+        }
+
+
+        .subtitle {
+
+            color: #70857b;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =====================================================
+           SOIL STATUS
+        ===================================================== */
+
+        .soil-status {
+
+            background: #edf9f0;
+
+            border:
+                1px solid
+                #c7ebd1;
+
+            border-radius: 18px;
+
+            padding: 20px;
+
+            margin-bottom: 28px;
+        }
+
+
+        .soil-status h3 {
+
+            color: #176b3e;
+
+            margin-bottom: 8px;
+        }
+
+
+        .soil-status p {
+
+            color: #648073;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+
+        .soil-values {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 12px;
+
+            margin-top: 18px;
+        }
+
+
+        .soil-value {
+
+            background: white;
+
+            border-radius: 13px;
+
+            padding: 17px;
+
+            text-align: center;
+
+            border:
+                1px solid
+                #e0eee4;
+        }
+
+
+        .soil-value span {
+
+            display: block;
+
+            font-size: 12px;
+
+            color: #789087;
+
+            margin-bottom: 7px;
+        }
+
+
+        .soil-value strong {
+
+            font-size: 22px;
+
+            color: #145c38;
+        }
+
+
+        /* =====================================================
+           ENVIRONMENT
+        ===================================================== */
+
+        .input-section {
+
+            margin-top: 28px;
+        }
+
+
+        .input-section h3 {
+
+            font-size: 20px;
+
+            margin-bottom: 17px;
+        }
+
+
+        .input-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+        }
+
+
+        .input-group label {
+
+            display: block;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            margin-bottom: 7px;
+
+            color: #36594c;
+        }
+
+
+        .input-group input {
+
+            width: 100%;
+
+            padding:
+                14px
+                15px;
+
+            border:
+                1px solid
+                #d4e4d9;
+
+            border-radius: 12px;
+
+            outline: none;
+
+            font-size: 16px;
+
+            background: #fbfffc;
+        }
+
+
+        .input-group input:focus {
+
+            border-color: #20c766;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(32,199,102,0.10);
+        }
+
+
+        .auto-input {
+
+            background: #f0faf3 !important;
+
+            border-color:
+                #9bdbb0 !important;
+
+            color: #145c38;
+
+            font-weight: 600;
+        }
+
+
+        .auto-note {
+
+            color: #6c8478;
+
+            font-size: 12px;
+
+            margin-top: 6px;
+        }
+
+
+        /* =====================================================
+           BUTTON
+        ===================================================== */
+
+        .recommend-btn {
+
+            width: 100%;
+
+            margin-top: 30px;
+
+            padding: 17px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background: #20c766;
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+
+        .recommend-btn:hover {
+
+            background: #18ae58;
+        }
+
+
+        .recommend-btn:disabled {
+
+            background: #a8dfbd;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
+        .message {
+
+            display: none;
+
+            margin-top: 18px;
+
+            padding:
+                15px
+                18px;
+
+            border-radius: 13px;
+
+            font-weight: 500;
+        }
+
+
+        .success {
+
+            background: #e7f9ed;
+
+            color: #168547;
+        }
+
+
+        .error {
+
+            background: #ffe9e6;
+
+            color: #d53e35;
+        }
+
+
+        /* =====================================================
+           RESULT
+        ===================================================== */
+
+        .result {
+
+            display: none;
+
+            margin-top: 30px;
+
+            padding-top: 28px;
+
+            border-top:
+                1px solid
+                #e1eee5;
+        }
+
+
+        .result-title {
+
+            font-size: 25px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .best-crop {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e4f9e9,
+                    #f7fff8
+                );
+
+            border:
+                1px solid
+                #bde8c8;
+
+            border-radius: 20px;
+
+            padding: 28px;
+
+            text-align: center;
+        }
+
+
+        .best-crop .emoji {
+
+            font-size: 50px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .best-crop .label {
+
+            color: #6b8277;
+
+            font-size: 14px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .best-crop h3 {
+
+            font-size: 32px;
+
+            color: #126438;
+
+            margin-bottom: 8px;
+
+            text-transform: capitalize;
+        }
+
+
+        .confidence {
+
+            color: #3d7055;
+
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           RANKED CROPS
+        ===================================================== */
+
+        .ranked {
+
+            margin-top: 22px;
+        }
+
+
+        .ranked h3 {
+
+            font-size: 20px;
+
+            margin-bottom: 13px;
+        }
+
+
+        .crop-row {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content:
+                space-between;
+
+            background: #f6faf7;
+
+            padding:
+                15px
+                18px;
+
+            border-radius: 13px;
+
+            margin-bottom: 9px;
+        }
+
+
+        .crop-name {
+
+            text-transform:
+                capitalize;
+
+            font-weight: 600;
+        }
+
+
+        .crop-confidence {
+
+            font-weight: bold;
+
+            color: #168547;
+        }
+
+
+        /* =====================================================
+           INFO
+        ===================================================== */
+
+        .important {
+
+            margin-top: 25px;
+
+            padding: 20px;
+
+            border-radius: 16px;
+
+            background: #edf7ff;
+
+            border:
+                1px solid
+                #cce7f8;
+
+            color: #426575;
+
+            line-height: 1.5;
+
+            font-size: 14px;
+        }
+
+
+        .important strong {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #315568;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 700px) {
+
+            .page {
+
+                padding:
+                    20px
+                    15px
+                    40px;
+            }
+
+
+            .card {
+
+                padding: 22px;
+            }
+
+
+            .soil-values {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .input-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .hero h1 {
+
+                font-size: 30px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="header">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🌱
+            </div>
+
+            <div>
+
+                <h2>
+                    AgriMind AI
+                </h2>
+
+                <p>
+                    Smart Farming Assistant
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="/dashboard"
+            class="dashboard-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <div class="hero">
+
+        <div class="hero-icon">
+            🌾
+        </div>
+
+        <h1>
+            Crop Recommendation
+        </h1>
+
+        <p>
+            AI crop recommendation using your latest soil
+            measurements and environmental conditions.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN CARD
+    ====================================================== -->
+
+    <div class="card">
+
+
+        <div class="section-title">
+
+            <div class="section-icon">
+                🧪
+            </div>
+
+            <h2>
+                Soil Values
+            </h2>
+
+        </div>
+
+
+        <p class="subtitle">
+
+            Your latest available soil measurements are
+            automatically loaded from AgriMind AI.
+
+        </p>
+
+
+        <!-- =================================================
+             SOIL VALUES
+        ================================================== -->
+
+        <div class="soil-status">
+
+            <h3 id="soilStatusTitle">
+                🔄 Loading soil data...
+            </h3>
+
+
+            <p id="soilStatusText">
+
+                Retrieving your latest N, P, K and pH
+                measurements.
+
+            </p>
+
+
+            <div class="soil-values">
+
+
+                <div class="soil-value">
+
+                    <span>
+                        Nitrogen (N)
+                    </span>
+
+                    <strong id="displayN">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="soil-value">
+
+                    <span>
+                        Phosphorus (P)
+                    </span>
+
+                    <strong id="displayP">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="soil-value">
+
+                    <span>
+                        Potassium (K)
+                    </span>
+
+                    <strong id="displayK">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="soil-value">
+
+                    <span>
+                        Soil pH
+                    </span>
+
+                    <strong id="displayPH">
+                        -
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ENVIRONMENT
+        ================================================== -->
+
+        <div class="input-section">
+
+            <h3>
+                🌦️ Environmental Conditions
+            </h3>
+
+
+            <div class="input-grid">
+
+
+                <div class="input-group">
+
+                    <label>
+                        Temperature (°C)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="temperature"
+                        class="auto-input"
+                        step="0.01"
+                        placeholder="Loading..."
+                    >
+
+                    <div class="auto-note">
+                        Automatically obtained from weather data.
+                    </div>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label>
+                        Humidity (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="humidity"
+                        class="auto-input"
+                        step="0.01"
+                        placeholder="Loading..."
+                    >
+
+                    <div class="auto-note">
+                        Automatically obtained from weather data.
+                    </div>
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label>
+                        Rainfall (mm)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="rainfall"
+                        class="auto-input"
+                        step="0.01"
+                        placeholder="Loading..."
+                    >
+
+                    <div class="auto-note">
+                        Automatically obtained from weather data.
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             BUTTON
+        ================================================== -->
+
+        <button
+            type="button"
+            id="recommendBtn"
+            class="recommend-btn"
+            disabled
+        >
+            🌾 Recommend Best Crop
+        </button>
+
+
+        <!-- =================================================
+             MESSAGE
+        ================================================== -->
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+
+        <!-- =================================================
+             RESULT
+        ================================================== -->
+
+        <div
+            id="result"
+            class="result"
+        >
+
+            <h2 class="result-title">
+                🌱 AI Crop Recommendation
+            </h2>
+
+
+            <div class="best-crop">
+
+                <div class="emoji">
+                    🌾
+                </div>
+
+                <div class="label">
+                    BEST RECOMMENDED CROP
+                </div>
+
+                <h3 id="recommendedCrop">
+                    -
+                </h3>
+
+                <div class="confidence">
+
+                    ML Confidence:
+
+                    <span id="confidence">
+                        -
+                    </span>%
+
+                </div>
+
+            </div>
+
+
+            <div class="ranked">
+
+                <h3>
+                    🏆 Top Crop Predictions
+                </h3>
+
+                <div id="rankedCrops"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             INFORMATION
+        ================================================== -->
+
+        <div class="important">
+
+            <strong>
+                ℹ️ How AgriMind AI works
+            </strong>
+
+            The latest N, P, K and pH measurements are
+            automatically retrieved from the soil database.
+
+            These values are combined with temperature,
+            humidity and rainfall and sent to the trained
+            Random Forest crop model.
+
+            <br><br>
+
+            <b>
+                Note:
+            </b>
+
+            N, P, K and pH cannot be genuinely measured from
+            an ordinary soil photograph. They must come from
+            a soil sensor or laboratory soil test.
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+// ============================================================
+// ELEMENTS
+// ============================================================
+
+const displayN =
+    document.getElementById("displayN");
+
+const displayP =
+    document.getElementById("displayP");
+
+const displayK =
+    document.getElementById("displayK");
+
+const displayPH =
+    document.getElementById("displayPH");
+
+
+const soilStatusTitle =
+    document.getElementById(
+        "soilStatusTitle"
+    );
+
+
+const soilStatusText =
+    document.getElementById(
+        "soilStatusText"
+    );
+
+
+const temperature =
+    document.getElementById(
+        "temperature"
+    );
+
+
+const humidity =
+    document.getElementById(
+        "humidity"
+    );
+
+
+const rainfall =
+    document.getElementById(
+        "rainfall"
+    );
+
+
+const recommendBtn =
+    document.getElementById(
+        "recommendBtn"
+    );
+
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+
+const result =
+    document.getElementById(
+        "result"
+    );
+
+
+const recommendedCrop =
+    document.getElementById(
+        "recommendedCrop"
+    );
+
+
+const confidence =
+    document.getElementById(
+        "confidence"
+    );
+
+
+const rankedCrops =
+    document.getElementById(
+        "rankedCrops"
+    );
+
+
+// ============================================================
+// DATA
+// ============================================================
+
+let soilData = null;
+
+let weatherData = null;
+
+
+// ============================================================
+// LOAD SOIL DATA
+// ============================================================
+
+async function loadSoilData() {
+
+    try {
+
+        soilStatusTitle.textContent =
+            "🔄 Loading soil data...";
+
+
+        soilStatusText.textContent =
+            "Getting your latest soil measurements.";
+
+
+        const response =
+            await fetch(
+                "/api/soil-data",
+                {
+                    method: "GET",
+                    credentials: "same-origin"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                data.error ||
+                "No soil data available."
+            );
+
+        }
+
+
+        soilData =
+            data.soil;
+
+
+        // ====================================================
+        // DISPLAY REAL VALUES
+        // ====================================================
+
+        displayN.textContent =
+            soilData.nitrogen;
+
+
+        displayP.textContent =
+            soilData.phosphorus;
+
+
+        displayK.textContent =
+            soilData.potassium;
+
+
+        displayPH.textContent =
+            soilData.ph;
+
+
+        soilStatusTitle.textContent =
+            "✅ Soil data loaded";
+
+
+        soilStatusText.textContent =
+            "Real soil measurements are ready for crop recommendation.";
+
+
+        await loadWeatherData();
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "SOIL DATA ERROR:",
+            error
+        );
+
+
+        soilStatusTitle.textContent =
+            "❌ Soil data unavailable";
+
+
+        soilStatusText.textContent =
+            error.message ||
+            "Please complete soil analysis first.";
+
+
+        recommendBtn.disabled =
+            true;
+
+
+        showMessage(
+            "No soil measurements were found. Complete the soil sensor/test analysis first.",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// LOAD WEATHER DATA
+// ============================================================
+
+async function loadWeatherData() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/weather-data",
+                {
+                    method: "GET",
+                    credentials: "same-origin"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.message ||
+                data.error ||
+                "Weather data unavailable."
+            );
+
+        }
+
+
+        weatherData =
+            data.weather || data;
+
+
+        // ====================================================
+        // ACCEPT DIFFERENT WEATHER KEY NAMES
+        // ====================================================
+
+        const temp =
+            weatherData.temperature ??
+            weatherData.temp;
+
+
+        const hum =
+            weatherData.humidity ??
+            weatherData.hum;
+
+
+        const rain =
+            weatherData.rainfall ??
+            weatherData.rain ??
+            0;
+
+
+        if (
+            !Number.isFinite(
+                Number(temp)
+            )
+        ) {
+
+            throw new Error(
+                "Temperature was not returned by weather API."
+            );
+
+        }
+
+
+        if (
+            !Number.isFinite(
+                Number(hum)
+            )
+        ) {
+
+            throw new Error(
+                "Humidity was not returned by weather API."
+            );
+
+        }
+
+
+        // ====================================================
+        // FILL AUTOMATICALLY
+        // ====================================================
+
+        temperature.value =
+            Number(temp).toFixed(2);
+
+
+        humidity.value =
+            Number(hum).toFixed(2);
+
+
+        rainfall.value =
+            Number(rain).toFixed(2);
+
+
+        // ====================================================
+        // ENABLE BUTTON
+        // ====================================================
+
+        recommendBtn.disabled =
+            false;
+
+
+        showMessage(
+            "Soil and weather data loaded successfully.",
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "WEATHER DATA ERROR:",
+            error
+        );
+
+
+        // ----------------------------------------------------
+        // IMPORTANT:
+        // Soil is available, but weather endpoint isn't.
+        // ----------------------------------------------------
+
+        recommendBtn.disabled =
+            true;
+
+
+        showMessage(
+            "Soil data loaded, but weather data could not be loaded. Fix /api/weather-data first.",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// RECOMMEND CROP
+// ============================================================
+
+recommendBtn.addEventListener(
+    "click",
+    async function () {
+
+        if (!soilData) {
+
+            showMessage(
+                "Soil data is not available.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const tempValue =
+            parseFloat(
+                temperature.value
+            );
+
+
+        const humidityValue =
+            parseFloat(
+                humidity.value
+            );
+
+
+        const rainfallValue =
+            parseFloat(
+                rainfall.value
+            );
+
+
+        if (
+            !Number.isFinite(
+                tempValue
+            )
+        ) {
+
+            showMessage(
+                "Temperature is not available.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        if (
+            !Number.isFinite(
+                humidityValue
+            )
+        ) {
+
+            showMessage(
+                "Humidity is not available.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        if (
+            !Number.isFinite(
+                rainfallValue
+            )
+        ) {
+
+            showMessage(
+                "Rainfall is not available.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        recommendBtn.disabled =
+            true;
+
+
+        recommendBtn.textContent =
+            "🔄 Predicting crop...";
+
+
+        result.style.display =
+            "none";
+
+
+        hideMessage();
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/crop-recommendation",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        credentials:
+                            "same-origin",
+
+                        body:
+                            JSON.stringify({
+
+                                nitrogen:
+                                    soilData.nitrogen,
+
+                                phosphorus:
+                                    soilData.phosphorus,
+
+                                potassium:
+                                    soilData.potassium,
+
+                                ph:
+                                    soilData.ph,
+
+                                temperature:
+                                    tempValue,
+
+                                humidity:
+                                    humidityValue,
+
+                                rainfall:
+                                    rainfallValue
+
+                            })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+                    data.message ||
+                    data.error ||
+                    "Crop prediction failed."
+                );
+
+            }
+
+
+            const cropResult =
+                data.result || data;
+
+
+            const crop =
+                cropResult.crop ||
+                cropResult.recommended_crop;
+
+
+            const cropConfidence =
+                cropResult.confidence ??
+                cropResult.ml_confidence;
+
+
+            recommendedCrop.textContent =
+                crop
+                    ? crop
+                    : "-";
+
+
+            confidence.textContent =
+                cropConfidence !== undefined
+                    ? cropConfidence
+                    : "-";
+
+
+            // =================================================
+            // RANKED CROPS
+            // =================================================
+
+            rankedCrops.innerHTML =
+                "";
+
+
+            const ranked =
+                cropResult.ranked_crops ||
+                [];
+
+
+            ranked.forEach(
+                function(item, index) {
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    row.className =
+                        "crop-row";
+
+
+                    const name =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    name.className =
+                        "crop-name";
+
+
+                    name.textContent =
+                        `${index + 1}. ${item.crop}`;
+
+
+                    const percent =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    percent.className =
+                        "crop-confidence";
+
+
+                    percent.textContent =
+                        `${item.confidence}%`;
+
+
+                    row.appendChild(
+                        name
+                    );
+
+
+                    row.appendChild(
+                        percent
+                    );
+
+
+                    rankedCrops.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+
+            result.style.display =
+                "block";
+
+
+            showMessage(
+                "Crop recommendation generated using your real soil measurements and the trained Random Forest model.",
+                "success"
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "CROP ERROR:",
+                error
+            );
+
+
+            showMessage(
+                error.message ||
+                "Unable to generate crop recommendation.",
+                "error"
+            );
+
+        }
+
+        finally {
+
+            recommendBtn.disabled =
+                false;
+
+
+            recommendBtn.textContent =
+                "🌾 Recommend Best Crop";
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// MESSAGE
+// ============================================================
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.textContent =
+        (
+            type === "error"
+                ? "❌ "
+                : "✅ "
+        ) + text;
+
+
+    message.className =
+        "message " + type;
+
+
+    message.style.display =
+        "block";
+
+}
+
+
+function hideMessage() {
+
+    message.style.display =
+        "none";
+
+}
+
+
+// ============================================================
+// START
+// ============================================================
+
+loadSoilData();
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Weather Insights | AgriMind AI</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(135deg, #eef9f0, #f8fcf8);
+            color: #1d2b22;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 76px;
+            padding: 0 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: linear-gradient(
+                135deg,
+                #145c32,
+                #218b4d
+            );
+
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            color: #ffd84d;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .logo-icon {
+            font-size: 31px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+
+            background: rgba(255,255,255,0.95);
+            color: #176b3a;
+
+            padding: 11px 20px;
+            border-radius: 10px;
+
+            font-weight: bold;
+
+            transition: 0.25s;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            background: #ffffff;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        /* ================= MAIN ================= */
+
+        .container {
+            width: 92%;
+            max-width: 1150px;
+            margin: 45px auto 60px;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .heading h1 {
+            font-size: 40px;
+            color: #176b3a;
+            margin-bottom: 10px;
+        }
+
+        .heading p {
+            color: #68736d;
+            font-size: 16px;
+        }
+
+        /* ================= LOCATION ================= */
+
+        .location-box {
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 22px 25px;
+
+            margin-bottom: 25px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+
+            border: 1px solid #e4eee6;
+        }
+
+        .location-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .location-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #e8f7ec;
+
+            font-size: 23px;
+        }
+
+        .location-box h3 {
+            color: #176b3a;
+            margin-bottom: 5px;
+        }
+
+        .location-box p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            border: none;
+
+            background: #176b3a;
+            color: white;
+
+            padding: 11px 20px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            transition: 0.25s;
+        }
+
+        .refresh-btn:hover {
+            background: #0f542b;
+            transform: translateY(-2px);
+        }
+
+        /* ================= CURRENT WEATHER ================= */
+
+        .current-weather {
+            display: grid;
+
+            grid-template-columns: 1.2fr 2fr;
+
+            gap: 22px;
+
+            margin-bottom: 25px;
+        }
+
+        .main-weather {
+            background:
+                linear-gradient(
+                    145deg,
+                    #176b3a,
+                    #2a9b58
+                );
+
+            color: white;
+
+            border-radius: 22px;
+
+            padding: 32px;
+
+            min-height: 230px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            box-shadow: 0 12px 30px rgba(23,107,58,0.22);
+        }
+
+        .main-weather::after {
+            content: "☁️";
+
+            position: absolute;
+
+            right: 25px;
+            bottom: -15px;
+
+            font-size: 120px;
+
+            opacity: 0.12;
+        }
+
+        .main-weather small {
+            opacity: 0.85;
+            font-size: 14px;
+        }
+
+        .main-weather h2 {
+            margin-top: 12px;
+            font-size: 22px;
+        }
+
+        .big-temperature {
+            font-size: 55px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .condition-text {
+            font-size: 17px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        /* ================= WEATHER STATS ================= */
+
+        .weather-grid {
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 18px;
+        }
+
+        .weather-card {
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 22px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 16px;
+
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+
+            border: 1px solid #e7eee8;
+
+            transition: 0.25s;
+        }
+
+        .weather-card:hover {
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 12px 30px rgba(0,0,0,0.10);
+        }
+
+        .weather-icon {
+            width: 52px;
+            height: 52px;
+
+            border-radius: 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #edf8ef;
+
+            font-size: 27px;
+        }
+
+        .weather-card h3 {
+            color: #78827c;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .weather-value {
+            color: #176b3a;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* ================= INSIGHT ================= */
+
+        .insight-card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 20px;
+
+            margin-top: 25px;
+
+            box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+
+            border: 1px solid #e5eee7;
+        }
+
+        .insight-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            margin-bottom: 15px;
+        }
+
+        .insight-title-icon {
+            width: 45px;
+            height: 45px;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #e7f7eb;
+
+            font-size: 23px;
+        }
+
+        .insight-card h2 {
+            color: #176b3a;
+            font-size: 23px;
+        }
+
+        .insight-card p {
+            color: #59635d;
+
+            line-height: 1.8;
+
+            font-size: 16px;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status {
+            margin-top: 20px;
+
+            padding: 16px 18px;
+
+            border-radius: 12px;
+
+            background: #eef9f0;
+
+            border-left: 5px solid #176b3a;
+
+            color: #176b3a;
+
+            font-weight: bold;
+        }
+
+        /* ================= FARMING TIPS ================= */
+
+        .tips-section {
+            margin-top: 25px;
+        }
+
+        .tips-section h2 {
+            color: #176b3a;
+            margin-bottom: 18px;
+        }
+
+        .tips-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+        }
+
+        .tip-card {
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 18px;
+
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+
+            border: 1px solid #e5eee7;
+        }
+
+        .tip-card span {
+            font-size: 30px;
+        }
+
+        .tip-card h3 {
+            color: #176b3a;
+            margin: 12px 0 8px;
+        }
+
+        .tip-card p {
+            color: #68736d;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* ================= LOADING ================= */
+
+        .loading {
+            text-align: center;
+
+            padding: 45px;
+
+            color: #68736d;
+
+            background: white;
+
+            border-radius: 18px;
+
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        }
+
+        .loader {
+            width: 35px;
+            height: 35px;
+
+            border: 4px solid #dcefe1;
+            border-top: 4px solid #176b3a;
+
+            border-radius: 50%;
+
+            animation: spin 1s linear infinite;
+
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ================= ERROR ================= */
+
+        .error {
+            display: none;
+
+            background: #fff0f0;
+
+            color: #b3261e;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            text-align: center;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 850px) {
+
+            .current-weather {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding: 0 18px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .logo-icon {
+                font-size: 25px;
+            }
+
+            .back-btn {
+                padding: 9px 12px;
+                font-size: 13px;
+            }
+
+            .container {
+                width: 94%;
+                margin-top: 30px;
+            }
+
+            .heading h1 {
+                font-size: 31px;
+            }
+
+            .location-box {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            .weather-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .big-temperature {
+                font-size: 45px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+
+        <span class="logo-icon">🌱</span>
+
+        <span>AgriMind AI</span>
+
+    </div>
+
+    <a href="/dashboard" class="back-btn">
+        ← Dashboard
+    </a>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="container">
+
+    <div class="heading">
+
+        <h1>Weather Insights</h1>
+
+        <p>
+            Real-time weather information for smarter farming decisions.
+        </p>
+
+    </div>
+
+
+    <!-- LOCATION -->
+
+    <div class="location-box">
+
+        <div class="location-left">
+
+            <div class="location-icon">
+                📍
+            </div>
+
+            <div>
+
+                <h3>Your Farm</h3>
+
+                <p>
+                    Current weather conditions
+                </p>
+
+            </div>
+
+        </div>
+
+        <button
+            class="refresh-btn"
+            onclick="loadWeather()">
+
+            ↻ Refresh Weather
+
+        </button>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div
+        id="error"
+        class="error">
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div
+        id="loading"
+        class="loading">
+
+        <div class="loader"></div>
+
+        Getting current weather...
+
+    </div>
+
+
+    <!-- WEATHER CONTENT -->
+
+    <div
+        id="weatherContent"
+        style="display:none;">
+
+
+        <!-- CURRENT WEATHER -->
+
+        <div class="current-weather">
+
+
+            <!-- MAIN WEATHER -->
+
+            <div class="main-weather">
+
+                <small>
+                    CURRENT CONDITIONS
+                </small>
+
+                <h2>
+                    Your Farm
+                </h2>
+
+                <div
+                    id="temperature"
+                    class="big-temperature">
+
+                    -- °C
+
+                </div>
+
+                <div
+                    id="condition"
+                    class="condition-text">
+
+                    Loading...
+
+                </div>
+
+            </div>
+
+
+            <!-- WEATHER STATISTICS -->
+
+            <div class="weather-grid">
+
+
+                <!-- HUMIDITY -->
+
+                <div class="weather-card">
+
+                    <div class="weather-icon">
+                        💧
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Humidity
+                        </h3>
+
+                        <div
+                            id="humidity"
+                            class="weather-value">
+
+                            --
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RAINFALL -->
+
+                <div class="weather-card">
+
+                    <div class="weather-icon">
+                        🌧️
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Rainfall
+                        </h3>
+
+                        <div
+                            id="rainfall"
+                            class="weather-value">
+
+                            --
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- WIND -->
+
+                <div class="weather-card">
+
+                    <div class="weather-icon">
+                        💨
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Wind Speed
+                        </h3>
+
+                        <div
+                            id="wind"
+                            class="weather-value">
+
+                            --
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONDITION -->
+
+                <div class="weather-card">
+
+                    <div class="weather-icon">
+                        ☁️
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Condition
+                        </h3>
+
+                        <div
+                            id="conditionSmall"
+                            class="weather-value">
+
+                            --
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FARMING INSIGHT -->
+
+        <div class="insight-card">
+
+            <div class="insight-title">
+
+                <div class="insight-title-icon">
+                    🌱
+                </div>
+
+                <h2>
+                    Farming Insight
+                </h2>
+
+            </div>
+
+            <p id="insight">
+                --
+            </p>
+
+            <div class="status">
+
+                ☀️ Current Condition:
+                <span id="conditionStatus">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- FARMING TIPS -->
+
+        <section class="tips-section">
+
+            <h2>
+                🌾 Smart Farming Tips
+            </h2>
+
+            <div class="tips-grid">
+
+
+                <div class="tip-card">
+
+                    <span>💧</span>
+
+                    <h3>
+                        Irrigation
+                    </h3>
+
+                    <p>
+                        Check soil moisture before irrigation.
+                        Avoid unnecessary watering when rainfall
+                        is sufficient.
+                    </p>
+
+                </div>
+
+
+                <div class="tip-card">
+
+                    <span>🌿</span>
+
+                    <h3>
+                        Crop Monitoring
+                    </h3>
+
+                    <p>
+                        Monitor crops regularly when humidity
+                        and rainfall conditions increase disease
+                        risk.
+                    </p>
+
+                </div>
+
+
+                <div class="tip-card">
+
+                    <span>🌦️</span>
+
+                    <h3>
+                        Weather Planning
+                    </h3>
+
+                    <p>
+                        Use current weather conditions to plan
+                        irrigation, spraying and field activities.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script>
+
+async function loadWeather() {
+
+    const loading =
+        document.getElementById("loading");
+
+    const content =
+        document.getElementById("weatherContent");
+
+    const error =
+        document.getElementById("error");
+
+
+    loading.style.display = "block";
+
+    content.style.display = "none";
+
+    error.style.display = "none";
+
+
+    try {
+
+        /*
+         * First try to get the user's
+         * current browser location.
+         */
+
+        let url = "/weather-data";
+
+
+        if (navigator.geolocation) {
+
+            try {
+
+                const position =
+                    await new Promise(
+                        (resolve, reject) => {
+
+                            navigator.geolocation.getCurrentPosition(
+                                resolve,
+                                reject,
+                                {
+                                    enableHighAccuracy: true,
+                                    timeout: 8000,
+                                    maximumAge: 300000
+                                }
+                            );
+
+                        }
+                    );
+
+
+                const latitude =
+                    position.coords.latitude;
+
+                const longitude =
+                    position.coords.longitude;
+
+
+                url =
+                    `/weather-data?lat=${latitude}&lon=${longitude}`;
+
+            }
+            catch (locationError) {
+
+                /*
+                 * If location permission is denied,
+                 * backend will use its safe default.
+                 */
+
+                console.log(
+                    "Location unavailable. Using default weather location."
+                );
+
+            }
+
+        }
+
+
+        const response =
+            await fetch(url);
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message ||
+                "Unable to load weather."
+            );
+
+        }
+
+
+        /* =========================
+           UPDATE WEATHER
+           ========================= */
+
+        document.getElementById(
+            "temperature"
+        ).textContent =
+            data.temperature + " °C";
+
+
+        document.getElementById(
+            "humidity"
+        ).textContent =
+            data.humidity + " %";
+
+
+        document.getElementById(
+            "rainfall"
+        ).textContent =
+            data.rainfall + " mm";
+
+
+        document.getElementById(
+            "wind"
+        ).textContent =
+            data.wind_speed + " km/h";
+
+
+        document.getElementById(
+            "condition"
+        ).textContent =
+            data.condition;
+
+
+        document.getElementById(
+            "conditionSmall"
+        ).textContent =
+            data.condition;
+
+
+        document.getElementById(
+            "conditionStatus"
+        ).textContent =
+            data.condition;
+
+
+        document.getElementById(
+            "insight"
+        ).textContent =
+            data.insight;
+
+
+        /* =========================
+           SHOW CONTENT
+           ========================= */
+
+        loading.style.display = "none";
+
+        content.style.display = "block";
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Weather error:",
+            error
+        );
+
+
+        loading.style.display = "none";
+
+
+        errorBox =
+            document.getElementById("error");
+
+
+        errorBox.textContent =
+            error.message ||
+            "Unable to connect to the weather service.";
+
+
+        errorBox.style.display = "block";
+
+    }
+
+}
+
+
+/*
+ * Load weather automatically
+ * when page opens.
+ */
+
+loadWeather();
+
+</script>
+
+</body>
+</html>

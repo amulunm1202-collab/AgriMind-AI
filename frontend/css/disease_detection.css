@@ -1,0 +1,869 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f0fdf4,
+            #ecfdf5,
+            #ffffff
+        );
+
+    color: #173b2a;
+
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.navbar {
+
+    height: 72px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 7%;
+
+    background: white;
+
+    border-bottom:
+        1px solid #dcefe3;
+
+    box-shadow:
+        0 3px 15px
+        rgba(0, 0, 0, 0.04);
+
+}
+
+
+.logo {
+
+    font-size: 24px;
+
+    font-weight: 800;
+
+    color: #15803d;
+
+}
+
+
+.nav-links {
+
+    display: flex;
+
+    gap: 32px;
+
+}
+
+
+.nav-links a {
+
+    text-decoration: none;
+
+    color: #527064;
+
+    font-weight: 600;
+
+    padding: 10px 4px;
+
+}
+
+
+.nav-links a:hover {
+
+    color: #15803d;
+
+}
+
+
+.nav-links a.active {
+
+    color: #15803d;
+
+    border-bottom:
+        2px solid #15803d;
+
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.main-container {
+
+    width: 90%;
+
+    max-width: 1200px;
+
+    margin: auto;
+
+    padding:
+        55px 0 70px;
+
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+
+    text-align: center;
+
+    margin-bottom: 40px;
+
+}
+
+
+.badge {
+
+    display: inline-block;
+
+    background: #dcfce7;
+
+    color: #15803d;
+
+    padding:
+        7px 16px;
+
+    border-radius: 50px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.hero h1 {
+
+    font-size:
+        clamp(38px, 5vw, 62px);
+
+    line-height: 1.05;
+
+    color: #163c2a;
+
+}
+
+
+.hero h1 span {
+
+    color: #16a34a;
+
+}
+
+
+.hero p {
+
+    max-width: 650px;
+
+    margin: 18px auto 0;
+
+    color: #668074;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+}
+
+
+/* =========================================================
+   DETECTION CARD
+   ========================================================= */
+
+.detection-card {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    background: white;
+
+    border-radius: 28px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 60px
+        rgba(22, 101, 52, 0.10);
+
+    border:
+        1px solid #dcefe3;
+
+}
+
+
+/* =========================================================
+   UPLOAD SECTION
+   ========================================================= */
+
+.upload-section {
+
+    padding: 45px;
+
+}
+
+
+.section-title h2 {
+
+    font-size: 28px;
+
+    color: #173b2a;
+
+}
+
+
+.section-title p {
+
+    margin-top: 8px;
+
+    color: #789086;
+
+}
+
+
+.upload-box {
+
+    margin-top: 30px;
+
+    min-height: 280px;
+
+    border:
+        2px dashed #86c99b;
+
+    border-radius: 22px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    background: #f7fff9;
+
+    transition:
+        0.25s ease;
+
+}
+
+
+.upload-box:hover {
+
+    border-color: #16a34a;
+
+    background: #f0fdf4;
+
+    transform:
+        translateY(-2px);
+
+}
+
+
+.upload-icon {
+
+    width: 72px;
+
+    height: 72px;
+
+    border-radius: 50%;
+
+    background: #dcfce7;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 35px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.upload-box h3 {
+
+    font-size: 20px;
+
+}
+
+
+.upload-box p {
+
+    margin-top: 8px;
+
+    color: #70857a;
+
+}
+
+
+.upload-box span {
+
+    margin-top: 10px;
+
+    color: #9aac9f;
+
+    font-size: 12px;
+
+}
+
+
+.upload-box input {
+
+    display: none;
+
+}
+
+
+/* =========================================================
+   PREVIEW
+   ========================================================= */
+
+.preview-container {
+
+    display: none;
+
+    margin-top: 20px;
+
+    text-align: center;
+
+}
+
+
+.preview-container img {
+
+    width: 150px;
+
+    height: 150px;
+
+    object-fit: cover;
+
+    border-radius: 18px;
+
+    border:
+        3px solid #dcfce7;
+
+}
+
+
+.preview-container p {
+
+    margin-top: 8px;
+
+    color: #61766a;
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+.analyze-button {
+
+    width: 100%;
+
+    border: none;
+
+    margin-top: 22px;
+
+    padding: 17px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #15803d,
+            #16a34a
+        );
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 25px
+        rgba(22, 163, 74, 0.22);
+
+    transition:
+        0.2s ease;
+
+}
+
+
+.analyze-button:hover {
+
+    transform:
+        translateY(-2px);
+
+}
+
+
+.analyze-button:disabled {
+
+    opacity: 0.7;
+
+    cursor: wait;
+
+}
+
+
+/* =========================================================
+   RESULT SECTION
+   ========================================================= */
+
+.result-section {
+
+    background:
+        linear-gradient(
+            145deg,
+            #f0fdf4,
+            #ecfdf5
+        );
+
+    padding: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+/* =========================================================
+   EMPTY RESULT
+   ========================================================= */
+
+.empty-result {
+
+    text-align: center;
+
+    max-width: 350px;
+
+}
+
+
+.empty-icon {
+
+    font-size: 70px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.empty-result h2 {
+
+    font-size: 25px;
+
+}
+
+
+.empty-result p {
+
+    margin-top: 12px;
+
+    color: #70857a;
+
+    line-height: 1.6;
+
+}
+
+
+/* =========================================================
+   RESULT CARD
+   ========================================================= */
+
+.result-card {
+
+    width: 100%;
+
+    background: white;
+
+    border-radius: 22px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(22, 101, 52, 0.08);
+
+    text-align: center;
+
+}
+
+
+.result-icon {
+
+    font-size: 45px;
+
+}
+
+
+.result-card h2 {
+
+    margin-top: 10px;
+
+    font-size: 24px;
+
+}
+
+
+.result-label {
+
+    margin-top: 22px;
+
+    color: #81948a;
+
+    font-size: 13px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+}
+
+
+.disease-name {
+
+    margin-top: 8px;
+
+    color: #15803d;
+
+    font-size: 21px;
+
+    line-height: 1.4;
+
+}
+
+
+/* =========================================================
+   CONFIDENCE
+   ========================================================= */
+
+.confidence-box {
+
+    margin-top: 25px;
+
+    text-align: left;
+
+}
+
+
+.confidence-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 9px;
+
+    color: #50675a;
+
+}
+
+
+.confidence-header strong {
+
+    color: #15803d;
+
+}
+
+
+.confidence-bar {
+
+    height: 10px;
+
+    border-radius: 20px;
+
+    background: #e5eee8;
+
+    overflow: hidden;
+
+}
+
+
+.confidence-progress {
+
+    height: 100%;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #22c55e,
+            #15803d
+        );
+
+}
+
+
+/* =========================================================
+   TOP PREDICTIONS
+   ========================================================= */
+
+.top-predictions {
+
+    margin-top: 25px;
+
+    text-align: left;
+
+}
+
+
+.top-predictions h4 {
+
+    margin-bottom: 10px;
+
+}
+
+
+.prediction-row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding:
+        10px 0;
+
+    border-bottom:
+        1px solid #edf3ef;
+
+    font-size: 13px;
+
+}
+
+
+.prediction-row strong {
+
+    color: #15803d;
+
+}
+
+
+.class-index {
+
+    margin-top: 20px;
+
+    font-size: 12px;
+
+    color: #9aaa9f;
+
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.error-box {
+
+    margin-top: 25px;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    background: #fff1f2;
+
+    border:
+        1px solid #fecdd3;
+
+    color: #be123c;
+
+}
+
+
+.error-box p {
+
+    margin-top: 8px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   TIPS
+   ========================================================= */
+
+.tips {
+
+    margin-top: 50px;
+
+}
+
+
+.tips h2 {
+
+    text-align: center;
+
+    margin-bottom: 25px;
+
+}
+
+
+.tips-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 18px;
+
+}
+
+
+.tip {
+
+    display: flex;
+
+    gap: 15px;
+
+    padding: 22px;
+
+    background: white;
+
+    border:
+        1px solid #e1eee5;
+
+    border-radius: 18px;
+
+}
+
+
+.tip > span {
+
+    font-size: 30px;
+
+}
+
+
+.tip h3 {
+
+    font-size: 16px;
+
+}
+
+
+.tip p {
+
+    margin-top: 7px;
+
+    color: #7a8c82;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .navbar {
+
+        padding: 0 5%;
+
+    }
+
+
+    .nav-links {
+
+        gap: 12px;
+
+    }
+
+
+    .detection-card {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .tips-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .upload-section,
+    .result-section {
+
+        padding: 30px 22px;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .nav-links {
+
+        display: none;
+
+    }
+
+    .main-container {
+
+        width: 94%;
+
+        padding-top: 30px;
+
+    }
+
+}

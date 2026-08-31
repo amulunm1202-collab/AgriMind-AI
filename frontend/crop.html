@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AgriMind AI | Crop Recommendation</title>
+
+    <link rel="stylesheet" href="css/crop.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <div class="nav-container">
+
+            <a href="dashboard.html" class="logo">
+                <div class="logo-icon">🌱</div>
+
+                <div>
+                    <h2>AgriMind <span>AI</span></h2>
+                    <small>SMART AGRICULTURE</small>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+
+                <a href="crop.html" class="active">
+                    Crop AI
+                </a>
+
+                <a href="disease.html">
+                    Disease Detection
+                </a>
+
+                <a href="irrigation.html">
+                    Irrigation
+                </a>
+
+                <a href="risk.html">
+                    Risk Analysis
+                </a>
+
+            </nav>
+
+            <div class="profile">
+                <div class="profile-avatar">A</div>
+
+                <div>
+                    <strong>Farmer</strong>
+                    <small>AgriMind User</small>
+                </div>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main class="crop-page">
+
+        <!-- PAGE HEADER -->
+        <section class="page-header">
+
+            <div>
+
+                <span class="page-tag">
+                    🌱 AI CROP INTELLIGENCE
+                </span>
+
+                <h1>
+                    Find the <span>Perfect Crop</span>
+                    for Your Farm
+                </h1>
+
+                <p>
+                    Enter your soil and weather conditions.
+                    AgriMind AI will analyze the data and
+                    recommend the most suitable crop.
+                </p>
+
+            </div>
+
+            <div class="header-icon">
+                🌾
+            </div>
+
+        </section>
+
+
+        <!-- CONTENT -->
+        <section class="crop-content">
+
+
+            <!-- INPUT CARD -->
+            <div class="input-card">
+
+                <div class="card-heading">
+
+                    <div class="heading-icon">
+                        🌱
+                    </div>
+
+                    <div>
+                        <h2>Farm Conditions</h2>
+
+                        <p>
+                            Tell us about your soil and
+                            current environmental conditions.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <form id="cropForm">
+
+
+                    <!-- SOIL SECTION -->
+
+                    <div class="form-section">
+
+                        <div class="section-title">
+                            <span>01</span>
+                            Soil Nutrients
+                        </div>
+
+
+                        <div class="input-grid">
+
+                            <!-- NITROGEN -->
+
+                            <div class="input-group">
+
+                                <label for="nitrogen">
+                                    Nitrogen (N)
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="nitrogen"
+                                        placeholder="e.g. 90"
+                                        min="0"
+                                        required
+                                    >
+
+                                    <span>
+                                        kg/ha
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PHOSPHORUS -->
+
+                            <div class="input-group">
+
+                                <label for="phosphorus">
+                                    Phosphorus (P)
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="phosphorus"
+                                        placeholder="e.g. 42"
+                                        min="0"
+                                        required
+                                    >
+
+                                    <span>
+                                        kg/ha
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- POTASSIUM -->
+
+                            <div class="input-group">
+
+                                <label for="potassium">
+                                    Potassium (K)
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="potassium"
+                                        placeholder="e.g. 43"
+                                        min="0"
+                                        required
+                                    >
+
+                                    <span>
+                                        kg/ha
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PH -->
+
+                            <div class="input-group">
+
+                                <label for="ph">
+                                    Soil pH
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="ph"
+                                        placeholder="e.g. 6.5"
+                                        min="0"
+                                        max="14"
+                                        step="0.1"
+                                        required
+                                    >
+
+                                    <span>
+                                        pH
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- WEATHER SECTION -->
+
+                    <div class="form-section">
+
+                        <div class="section-title">
+                            <span>02</span>
+                            Weather Conditions
+                        </div>
+
+
+                        <div class="input-grid">
+
+                            <!-- TEMPERATURE -->
+
+                            <div class="input-group">
+
+                                <label for="temperature">
+                                    Temperature
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="temperature"
+                                        placeholder="e.g. 25"
+                                        step="0.1"
+                                        required
+                                    >
+
+                                    <span>
+                                        °C
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- HUMIDITY -->
+
+                            <div class="input-group">
+
+                                <label for="humidity">
+                                    Humidity
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="humidity"
+                                        placeholder="e.g. 80"
+                                        min="0"
+                                        max="100"
+                                        step="0.1"
+                                        required
+                                    >
+
+                                    <span>
+                                        %
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- RAINFALL -->
+
+                            <div class="input-group">
+
+                                <label for="rainfall">
+                                    Rainfall
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="rainfall"
+                                        placeholder="e.g. 200"
+                                        min="0"
+                                        step="0.1"
+                                        required
+                                    >
+
+                                    <span>
+                                        mm
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOCATION -->
+
+                    <div class="form-section">
+
+                        <div class="section-title">
+                            <span>03</span>
+                            Farm Location
+                        </div>
+
+
+                        <div class="location-box">
+
+                            <div class="location-icon">
+                                📍
+                            </div>
+
+                            <div>
+
+                                <label for="location">
+                                    Location
+                                </label>
+
+                                <select id="location">
+
+                                    <option value="">
+                                        Select your region
+                                    </option>
+
+                                    <option>
+                                        Karnataka
+                                    </option>
+
+                                    <option>
+                                        Maharashtra
+                                    </option>
+
+                                    <option>
+                                        Andhra Pradesh
+                                    </option>
+
+                                    <option>
+                                        Telangana
+                                    </option>
+
+                                    <option>
+                                        Tamil Nadu
+                                    </option>
+
+                                    <option>
+                                        Kerala
+                                    </option>
+
+                                    <option>
+                                        Other
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BUTTON -->
+
+                    <button
+                        type="submit"
+                        class="recommend-button"
+                    >
+
+                        <span class="button-icon">
+                            🤖
+                        </span>
+
+                        <span>
+                            Analyze & Recommend
+                        </span>
+
+                        <span class="arrow">
+                            →
+                        </span>
+
+                    </button>
+
+
+                    <p class="privacy-note">
+                        🔒 Your farm information stays private
+                        and is used only for analysis.
+                    </p>
+
+                </form>
+
+            </div>
+
+
+            <!-- RESULT CARD -->
+
+            <div class="result-card" id="resultCard">
+
+                <div class="result-placeholder" id="resultPlaceholder">
+
+                    <div class="result-illustration">
+                        🌱
+                    </div>
+
+                    <h2>
+                        Your AI Recommendation
+                    </h2>
+
+                    <p>
+                        Enter your farm conditions and click
+                        <strong>Analyze & Recommend</strong>
+                        to discover the best crop for your farm.
+                    </p>
+
+                    <div class="analysis-points">
+
+                        <div>
+                            <span>✓</span>
+                            Soil analysis
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            Weather analysis
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            Crop suitability
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RESULT WILL APPEAR HERE -->
+
+                <div
+                    class="result-content"
+                    id="resultContent"
+                    style="display: none;"
+                >
+
+                    <span class="result-label">
+                        🌱 AI RECOMMENDATION
+                    </span>
+
+                    <h2 id="cropName">
+                        Rice
+                    </h2>
+
+                    <p id="resultDescription">
+                        Your farm conditions appear suitable
+                        for this crop.
+                    </p>
+
+                    <div class="confidence">
+
+                        <div class="confidence-top">
+
+                            <span>
+                                AI Confidence
+                            </span>
+
+                            <strong id="confidenceValue">
+                                92%
+                            </strong>
+
+                        </div>
+
+                        <div class="confidence-bar">
+
+                            <div
+                                id="confidenceFill"
+                                style="width: 92%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="recommendation-details">
+
+                        <div>
+                            <span>🌡</span>
+                            <strong>Climate</strong>
+                            <small id="climateValue">
+                                Suitable
+                            </small>
+                        </div>
+
+                        <div>
+                            <span>🌱</span>
+                            <strong>Soil</strong>
+                            <small id="soilValue">
+                                Suitable
+                            </small>
+                        </div>
+
+                        <div>
+                            <span>💧</span>
+                            <strong>Water</strong>
+                            <small id="waterValue">
+                                Moderate
+                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-explanation">
+
+                        <strong>
+                            🤖 Why this crop?
+                        </strong>
+
+                        <p id="explanationText">
+                            The soil nutrients and weather
+                            conditions match the requirements
+                            of the recommended crop.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="try-again"
+                        id="tryAgain"
+                    >
+                        ← Analyze Another Farm
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- INFORMATION -->
+
+        <section class="info-section">
+
+            <div class="info-card">
+
+                <span>🌱</span>
+
+                <div>
+
+                    <strong>
+                        Data-Driven Agriculture
+                    </strong>
+
+                    <p>
+                        AgriMind AI combines soil and environmental
+                        data to help farmers make informed crop
+                        selection decisions.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <span>🤖</span>
+
+                <div>
+
+                    <strong>
+                        Machine Learning
+                    </strong>
+
+                    <p>
+                        Our recommendation engine learns patterns
+                        from agricultural data to identify suitable
+                        crops.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <span>🌍</span>
+
+                <div>
+
+                    <strong>
+                        Sustainable Farming
+                    </strong>
+
+                    <p>
+                        Better crop selection can support efficient
+                        resource use and sustainable agriculture.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="js/crop.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Soil Scan | AgriMind AI</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(
+                135deg,
+                #eef8ed,
+                #f8fbf6
+            );
+            color: #123c2d;
+            min-height: 100vh;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 950px;
+            margin: auto;
+            padding: 30px 20px 60px;
+        }
+
+        /* HEADER */
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            background: #dff5e4;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 27px;
+        }
+
+        .brand h2 {
+            font-size: 21px;
+            margin-bottom: 4px;
+        }
+
+        .brand p {
+            color: #71877d;
+            font-size: 13px;
+        }
+
+        .dashboard-btn {
+            text-decoration: none;
+            color: #174d3a;
+            background: white;
+            padding: 11px 17px;
+            border-radius: 12px;
+            font-weight: 600;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .hero-icon {
+            font-size: 45px;
+            margin-bottom: 8px;
+        }
+
+        .hero h1 {
+            font-size: 37px;
+            color: #063d2c;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #687d73;
+            font-size: 16px;
+        }
+
+        /* CARD */
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 32px;
+
+            box-shadow:
+                0 15px 50px rgba(32,75,45,0.10);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 8px;
+        }
+
+        .section-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+            background: #dff6e5;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 24px;
+        }
+
+        .section-title h2 {
+            font-size: 23px;
+        }
+
+        .subtitle {
+            color: #70857b;
+            margin-bottom: 25px;
+        }
+
+        /* UPLOAD */
+
+        .upload-box {
+            border: 2px dashed #55d98a;
+            border-radius: 20px;
+            padding: 32px 20px;
+            text-align: center;
+            background: #fbfffb;
+        }
+
+        .camera {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .upload-box h3 {
+            font-size: 21px;
+            margin-bottom: 7px;
+        }
+
+        .upload-box p {
+            color: #71877d;
+            margin-bottom: 8px;
+        }
+
+        .formats {
+            color: #9aa9a2;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        #soilImage {
+            display: none;
+        }
+
+        .choose-btn {
+            display: inline-block;
+            background: #20c766;
+            color: white;
+
+            padding: 13px 24px;
+
+            border-radius: 12px;
+
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .choose-btn:hover {
+            background: #18ae58;
+        }
+
+        /* PREVIEW */
+
+        .preview-section {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 12px;
+        }
+
+        .preview-header h3 {
+            font-size: 19px;
+        }
+
+        .remove-btn {
+            border: none;
+            background: #ffe8e5;
+            color: #e64b42;
+
+            padding: 9px 15px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .preview-box {
+            width: 100%;
+            height: 320px;
+
+            border-radius: 18px;
+
+            background: #edf0ed;
+
+            overflow: hidden;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ANALYZE */
+
+        .analyze-btn {
+            width: 100%;
+            margin-top: 25px;
+
+            border: none;
+            border-radius: 14px;
+
+            padding: 17px;
+
+            background: #20c766;
+            color: white;
+
+            font-size: 17px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .analyze-btn:hover {
+            background: #18ae58;
+        }
+
+        .analyze-btn:disabled {
+            background: #a8dfbd;
+            cursor: not-allowed;
+        }
+
+        /* LOADING */
+
+        .loading {
+            display: none;
+            text-align: center;
+
+            margin-top: 18px;
+
+            color: #527469;
+            font-weight: 600;
+        }
+
+        /* MESSAGE */
+
+        .message {
+            display: none;
+
+            margin-top: 18px;
+
+            padding: 15px 18px;
+
+            border-radius: 13px;
+
+            font-weight: 500;
+        }
+
+        .error {
+            background: #ffe9e6;
+            color: #d53e35;
+        }
+
+        .success {
+            background: #e7f9ed;
+            color: #168547;
+        }
+
+        /* RESULT */
+
+        .result {
+            display: none;
+            margin-top: 28px;
+        }
+
+        .result-title {
+            font-size: 23px;
+            margin-bottom: 17px;
+        }
+
+        .result-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 14px;
+        }
+
+        .result-item {
+            background: #f5faf5;
+
+            border-radius: 15px;
+
+            padding: 17px;
+        }
+
+        .result-item span {
+            display: block;
+
+            color: #789087;
+
+            font-size: 13px;
+
+            margin-bottom: 6px;
+        }
+
+        .result-item strong {
+            font-size: 18px;
+        }
+
+        /* AUTOMATIC VALUES */
+
+        .automatic-values {
+            display: none;
+
+            margin-top: 25px;
+        }
+
+        .automatic-values h3 {
+            font-size: 21px;
+            margin-bottom: 6px;
+        }
+
+        .automatic-description {
+            color: #70857b;
+            margin-bottom: 15px;
+        }
+
+        .nutrient-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 12px;
+        }
+
+        .nutrient {
+            background: #f1f8f2;
+
+            border: 1px solid #dceee0;
+
+            border-radius: 14px;
+
+            padding: 17px;
+
+            text-align: center;
+        }
+
+        .nutrient span {
+            display: block;
+
+            color: #72867c;
+
+            font-size: 13px;
+
+            margin-bottom: 8px;
+        }
+
+        .nutrient strong {
+            font-size: 22px;
+            color: #145d40;
+        }
+
+        /* WEATHER */
+
+        .weather {
+            display: none;
+
+            margin-top: 28px;
+        }
+
+        .weather h3 {
+            font-size: 21px;
+            margin-bottom: 15px;
+        }
+
+        .weather-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 12px;
+        }
+
+        .weather-item {
+            background: #f3f8fc;
+
+            border: 1px solid #dcebf4;
+
+            border-radius: 14px;
+
+            padding: 17px;
+
+            text-align: center;
+        }
+
+        .weather-item span {
+            display: block;
+
+            color: #718491;
+
+            font-size: 13px;
+
+            margin-bottom: 8px;
+        }
+
+        .weather-item strong {
+            font-size: 18px;
+            color: #28546d;
+        }
+
+        /* CROP */
+
+        .crop-section {
+            display: none;
+
+            margin-top: 30px;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #edf9ef,
+                    #f8fcf8
+                );
+
+            border: 1px solid #d6ecd9;
+        }
+
+        .crop-section h2 {
+            font-size: 25px;
+
+            color: #0b5739;
+
+            margin-bottom: 18px;
+        }
+
+        .best-crop {
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 22px;
+
+            margin-bottom: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .best-crop-label {
+            color: #72867c;
+
+            font-size: 13px;
+
+            margin-bottom: 7px;
+        }
+
+        .best-crop-name {
+            font-size: 31px;
+
+            font-weight: bold;
+
+            color: #146b43;
+
+            margin-bottom: 8px;
+        }
+
+        .confidence {
+            font-size: 15px;
+            color: #547166;
+        }
+
+        .crop-info {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 13px;
+        }
+
+        .crop-info-box {
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 16px;
+        }
+
+        .crop-info-box span {
+            display: block;
+
+            color: #789087;
+
+            font-size: 13px;
+
+            margin-bottom: 6px;
+        }
+
+        .crop-info-box strong {
+            font-size: 16px;
+        }
+
+        .top-crops {
+            margin-top: 15px;
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 17px;
+        }
+
+        .top-crops h4 {
+            margin-bottom: 10px;
+        }
+
+        .crop-list {
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+        .crop-pill {
+            background: #e8f6eb;
+
+            color: #17613f;
+
+            padding: 8px 13px;
+
+            border-radius: 20px;
+
+            font-weight: 600;
+        }
+
+        /* IMPORTANT */
+
+        .important {
+            margin-top: 25px;
+
+            padding: 19px;
+
+            border-radius: 16px;
+
+            background: #edf7ff;
+
+            border: 1px solid #cce7f8;
+
+            color: #426575;
+
+            line-height: 1.5;
+        }
+
+        .important strong {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #315568;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .page {
+                padding: 20px 14px 40px;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .result-grid,
+            .crop-info {
+                grid-template-columns: 1fr;
+            }
+
+            .nutrient-grid,
+            .weather-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .preview-box {
+                height: 240px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🌱
+            </div>
+
+            <div>
+
+                <h2>
+                    AgriMind AI
+                </h2>
+
+                <p>
+                    Smart Farming Assistant
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="/dashboard"
+            class="dashboard-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- HERO -->
+
+    <div class="hero">
+
+        <div class="hero-icon">
+            🌱
+        </div>
+
+        <h1>
+            AI Soil Scan
+        </h1>
+
+        <p>
+            Upload a soil photograph for automatic
+            soil analysis and crop recommendation.
+        </p>
+
+    </div>
+
+
+    <!-- MAIN -->
+
+    <div class="card">
+
+
+        <!-- IMAGE ANALYSIS -->
+
+        <div class="section-title">
+
+            <div class="section-icon">
+                🔬
+            </div>
+
+            <h2>
+                Soil Image Analysis
+            </h2>
+
+        </div>
+
+        <p class="subtitle">
+            Upload a clear soil image. AgriMind AI will
+            automatically analyze it and continue to
+            crop recommendation.
+        </p>
+
+
+        <!-- UPLOAD -->
+
+        <div class="upload-box">
+
+            <div class="camera">
+                📷
+            </div>
+
+            <h3>
+                Upload Soil Image
+            </h3>
+
+            <p>
+                Choose a clear photograph of the soil.
+            </p>
+
+            <div class="formats">
+                JPG, JPEG, PNG or WEBP
+            </div>
+
+
+            <input
+                type="file"
+                id="soilImage"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+            >
+
+
+            <label
+                for="soilImage"
+                class="choose-btn"
+            >
+                📁 Choose Image
+            </label>
+
+        </div>
+
+
+        <!-- PREVIEW -->
+
+        <div
+            class="preview-section"
+            id="previewSection"
+        >
+
+            <div class="preview-header">
+
+                <h3>
+                    Soil Image Preview
+                </h3>
+
+                <button
+                    type="button"
+                    class="remove-btn"
+                    id="removeBtn"
+                >
+                    Remove Image
+                </button>
+
+            </div>
+
+
+            <div class="preview-box">
+
+                <img
+                    id="previewImage"
+                    alt="Soil image preview"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- ANALYZE -->
+
+        <button
+            type="button"
+            class="analyze-btn"
+            id="analyzeBtn"
+            disabled
+        >
+            🔍 Analyze Soil
+        </button>
+
+
+        <!-- LOADING -->
+
+        <div
+            class="loading"
+            id="loading"
+        >
+            🔄 Analyzing soil and preparing crop recommendation...
+        </div>
+
+
+        <!-- MESSAGE -->
+
+        <div
+            class="message"
+            id="message"
+        ></div>
+
+
+        <!-- SOIL RESULT -->
+
+        <div
+            class="result"
+            id="result"
+        >
+
+            <h2 class="result-title">
+                🌱 Soil Analysis Result
+            </h2>
+
+
+            <div class="result-grid">
+
+
+                <div class="result-item">
+
+                    <span>
+                        Soil Color
+                    </span>
+
+                    <strong id="soilColor">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="result-item">
+
+                    <span>
+                        Visible Texture
+                    </span>
+
+                    <strong id="soilTexture">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="result-item">
+
+                    <span>
+                        Apparent Moisture
+                    </span>
+
+                    <strong id="soilMoisture">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="result-item">
+
+                    <span>
+                        Soil Condition
+                    </span>
+
+                    <strong id="soilCondition">
+                        -
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- AUTOMATIC SOIL VALUES -->
+
+        <div
+            class="automatic-values"
+            id="automaticValues"
+        >
+
+            <h3>
+                🧪 Automatic Soil Values
+            </h3>
+
+            <p class="automatic-description">
+                Values generated automatically for the
+                crop recommendation model.
+            </p>
+
+
+            <div class="nutrient-grid">
+
+
+                <div class="nutrient">
+
+                    <span>
+                        Nitrogen (N)
+                    </span>
+
+                    <strong id="nitrogen">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="nutrient">
+
+                    <span>
+                        Phosphorus (P)
+                    </span>
+
+                    <strong id="phosphorus">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="nutrient">
+
+                    <span>
+                        Potassium (K)
+                    </span>
+
+                    <strong id="potassium">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="nutrient">
+
+                    <span>
+                        Soil pH
+                    </span>
+
+                    <strong id="ph">
+                        -
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- WEATHER -->
+
+        <div
+            class="weather"
+            id="weather"
+        >
+
+            <h3>
+                🌦️ Environmental Conditions
+            </h3>
+
+
+            <div class="weather-grid">
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Temperature
+                    </span>
+
+                    <strong id="temperature">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Humidity
+                    </span>
+
+                    <strong id="humidity">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Rainfall
+                    </span>
+
+                    <strong id="rainfall">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Condition
+                    </span>
+
+                    <strong id="condition">
+                        -
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- CROP -->
+
+        <div
+            class="crop-section"
+            id="cropSection"
+        >
+
+            <h2>
+                🌾 Crop Recommendation
+            </h2>
+
+
+            <div class="best-crop">
+
+                <div class="best-crop-label">
+                    BEST CROP FOR THESE CONDITIONS
+                </div>
+
+                <div
+                    class="best-crop-name"
+                    id="bestCrop"
+                >
+                    -
+                </div>
+
+                <div class="confidence">
+
+                    ML confidence:
+                    <strong id="confidence">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="crop-info">
+
+
+                <div class="crop-info-box">
+
+                    <span>
+                        ML Model
+                    </span>
+
+                    <strong id="model">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="crop-info-box">
+
+                    <span>
+                        Model Accuracy
+                    </span>
+
+                    <strong id="modelAccuracy">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="crop-info-box">
+
+                    <span>
+                        Alternative Crops
+                    </span>
+
+                    <strong id="alternatives">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="crop-info-box">
+
+                    <span>
+                        Recommendation
+                    </span>
+
+                    <strong id="reason">
+                        -
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="top-crops">
+
+                <h4>
+                    🏆 Top Recommended Crops
+                </h4>
+
+                <div
+                    class="crop-list"
+                    id="cropList"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- IMPORTANT -->
+
+        <div class="important">
+
+            <strong>
+                ℹ️ Important
+            </strong>
+
+            Soil photographs can estimate visible
+            characteristics such as color, texture and
+            apparent moisture.
+
+            <br><br>
+
+            The automatic N, P, K and pH values in this
+            image-only version are <strong>estimates</strong>.
+            Actual N, P, K and pH measurements require
+            a soil sensor or laboratory soil test.
+
+            <br><br>
+
+            The crop recommendation itself uses your
+            trained <strong>Random Forest</strong> crop
+            classification model.
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/* ============================================================
+   ELEMENTS
+============================================================ */
+
+const soilImage =
+    document.getElementById("soilImage");
+
+const previewSection =
+    document.getElementById("previewSection");
+
+const previewImage =
+    document.getElementById("previewImage");
+
+const analyzeBtn =
+    document.getElementById("analyzeBtn");
+
+const removeBtn =
+    document.getElementById("removeBtn");
+
+const message =
+    document.getElementById("message");
+
+const loading =
+    document.getElementById("loading");
+
+const result =
+    document.getElementById("result");
+
+const automaticValues =
+    document.getElementById("automaticValues");
+
+const weather =
+    document.getElementById("weather");
+
+const cropSection =
+    document.getElementById("cropSection");
+
+
+let selectedFile = null;
+
+
+/* ============================================================
+   IMAGE SELECT
+============================================================ */
+
+soilImage.addEventListener(
+    "change",
+    function () {
+
+        const file =
+            this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+        ];
+
+
+        if (!allowedTypes.includes(file.type)) {
+
+            showMessage(
+                "Please select JPG, JPEG, PNG or WEBP.",
+                "error"
+            );
+
+            this.value = "";
+
+            return;
+        }
+
+
+        selectedFile = file;
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function (event) {
+
+                previewImage.src =
+                    event.target.result;
+
+                previewSection.style.display =
+                    "block";
+
+                analyzeBtn.disabled =
+                    false;
+
+                result.style.display =
+                    "none";
+
+                automaticValues.style.display =
+                    "none";
+
+                weather.style.display =
+                    "none";
+
+                cropSection.style.display =
+                    "none";
+
+                hideMessage();
+
+            };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+/* ============================================================
+   REMOVE
+============================================================ */
+
+removeBtn.addEventListener(
+    "click",
+    function () {
+
+        selectedFile = null;
+
+        soilImage.value = "";
+
+        previewImage.src = "";
+
+        previewSection.style.display =
+            "none";
+
+        analyzeBtn.disabled =
+            true;
+
+        result.style.display =
+            "none";
+
+        automaticValues.style.display =
+            "none";
+
+        weather.style.display =
+            "none";
+
+        cropSection.style.display =
+            "none";
+
+        hideMessage();
+
+    }
+);
+
+
+/* ============================================================
+   MAIN ANALYSIS
+============================================================ */
+
+analyzeBtn.addEventListener(
+    "click",
+    async function () {
+
+
+        if (!selectedFile) {
+
+            showMessage(
+                "Please upload a soil image first.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "soil_image",
+            selectedFile
+        );
+
+
+        analyzeBtn.disabled =
+            true;
+
+        loading.style.display =
+            "block";
+
+        result.style.display =
+            "none";
+
+        automaticValues.style.display =
+            "none";
+
+        weather.style.display =
+            "none";
+
+        cropSection.style.display =
+            "none";
+
+        hideMessage();
+
+
+        try {
+
+
+            /* =================================================
+               STEP 1
+               SOIL IMAGE
+            ================================================= */
+
+            const soilResponse =
+                await fetch(
+                    "/api/soil-scan-image",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const soilData =
+                await soilResponse.json();
+
+
+            if (
+                !soilResponse.ok ||
+                !soilData.success
+            ) {
+
+                throw new Error(
+                    soilData.error ||
+                    "Soil image analysis failed."
+                );
+
+            }
+
+
+            /* =================================================
+               DISPLAY SOIL RESULT
+            ================================================= */
+
+            document.getElementById(
+                "soilColor"
+            ).textContent =
+                soilData.result.color || "-";
+
+
+            document.getElementById(
+                "soilTexture"
+            ).textContent =
+                soilData.result.texture || "-";
+
+
+            document.getElementById(
+                "soilMoisture"
+            ).textContent =
+                soilData.result.moisture || "-";
+
+
+            document.getElementById(
+                "soilCondition"
+            ).textContent =
+                soilData.result.condition || "-";
+
+
+            result.style.display =
+                "block";
+
+
+            /* =================================================
+               STEP 2
+               AUTOMATIC SOIL VALUES
+            ================================================= */
+
+            const soil =
+                soilData.soil_values;
+
+
+            if (!soil) {
+
+                throw new Error(
+                    "Automatic soil values were not returned."
+                );
+
+            }
+
+
+            document.getElementById(
+                "nitrogen"
+            ).textContent =
+                Number(soil.nitrogen).toFixed(1);
+
+
+            document.getElementById(
+                "phosphorus"
+            ).textContent =
+                Number(soil.phosphorus).toFixed(1);
+
+
+            document.getElementById(
+                "potassium"
+            ).textContent =
+                Number(soil.potassium).toFixed(1);
+
+
+            document.getElementById(
+                "ph"
+            ).textContent =
+                Number(soil.ph).toFixed(2);
+
+
+            automaticValues.style.display =
+                "block";
+
+
+            /* =================================================
+               STEP 3
+               WEATHER
+            ================================================= */
+
+            const weatherResponse =
+                await fetch(
+                    "/api/weather-data"
+                );
+
+
+            const weatherData =
+                await weatherResponse.json();
+
+
+            if (
+                !weatherResponse.ok ||
+                !weatherData.success
+            ) {
+
+                throw new Error(
+                    weatherData.error ||
+                    "Weather data unavailable."
+                );
+
+            }
+
+
+            document.getElementById(
+                "temperature"
+            ).textContent =
+                `${Number(weatherData.temperature).toFixed(1)} °C`;
+
+
+            document.getElementById(
+                "humidity"
+            ).textContent =
+                `${Number(weatherData.humidity).toFixed(1)} %`;
+
+
+            document.getElementById(
+                "rainfall"
+            ).textContent =
+                `${Number(weatherData.rainfall).toFixed(1)} mm`;
+
+
+            document.getElementById(
+                "condition"
+            ).textContent =
+                weatherData.condition || "-";
+
+
+            weather.style.display =
+                "block";
+
+
+            /* =================================================
+               STEP 4
+               RANDOM FOREST CROP RECOMMENDATION
+            ================================================= */
+
+            const cropResponse =
+                await fetch(
+                    "/api/crop-recommendation",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            nitrogen:
+                                soil.nitrogen,
+
+                            phosphorus:
+                                soil.phosphorus,
+
+                            potassium:
+                                soil.potassium,
+
+                            ph:
+                                soil.ph,
+
+                            temperature:
+                                weatherData.temperature,
+
+                            humidity:
+                                weatherData.humidity,
+
+                            rainfall:
+                                weatherData.rainfall
+
+                        })
+                    }
+                );
+
+
+            const cropData =
+                await cropResponse.json();
+
+
+            if (
+                !cropResponse.ok ||
+                !cropData.success
+            ) {
+
+                throw new Error(
+                    cropData.message ||
+                    cropData.error ||
+                    "Crop recommendation failed."
+                );
+
+            }
+
+
+            /* =================================================
+               DISPLAY CROP
+            ================================================= */
+
+            const crop =
+                cropData.result;
+
+
+            document.getElementById(
+                "bestCrop"
+            ).textContent =
+                capitalize(
+                    crop.crop
+                );
+
+
+            document.getElementById(
+                "confidence"
+            ).textContent =
+                `${Number(crop.confidence).toFixed(2)}%`;
+
+
+            document.getElementById(
+                "model"
+            ).textContent =
+                crop.model || "Random Forest";
+
+
+            document.getElementById(
+                "modelAccuracy"
+            ).textContent =
+                `${Number(crop.model_accuracy).toFixed(2)}%`;
+
+
+            document.getElementById(
+                "alternatives"
+            ).textContent =
+                crop.alternatives &&
+                crop.alternatives.length
+                    ? crop.alternatives
+                        .map(capitalize)
+                        .join(", ")
+                    : "None";
+
+
+            document.getElementById(
+                "reason"
+            ).textContent =
+                crop.reason || "-";
+
+
+            /* =================================================
+               TOP CROPS
+            ================================================= */
+
+            const cropList =
+                document.getElementById(
+                    "cropList"
+                );
+
+
+            cropList.innerHTML = "";
+
+
+            if (
+                crop.ranked_crops &&
+                crop.ranked_crops.length
+            ) {
+
+                crop.ranked_crops.forEach(
+                    function (item) {
+
+                        const pill =
+                            document.createElement(
+                                "div"
+                            );
+
+                        pill.className =
+                            "crop-pill";
+
+
+                        pill.textContent =
+                            `${capitalize(item.crop)}
+                             — ${Number(item.confidence).toFixed(2)}%`;
+
+
+                        cropList.appendChild(
+                            pill
+                        );
+
+                    }
+                );
+
+            }
+
+
+            cropSection.style.display =
+                "block";
+
+
+            showMessage(
+                "Soil analyzed successfully. Crop recommendation generated automatically.",
+                "success"
+            );
+
+
+        } catch (error) {
+
+
+            console.error(
+                "AGRIMIND ERROR:",
+                error
+            );
+
+
+            showMessage(
+                error.message ||
+                "Unable to complete soil analysis.",
+                "error"
+            );
+
+
+        } finally {
+
+            analyzeBtn.disabled =
+                false;
+
+            loading.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.textContent =
+        (
+            type === "error"
+                ? "❌ "
+                : "✅ "
+        ) + text;
+
+
+    message.className =
+        "message " + type;
+
+
+    message.style.display =
+        "block";
+
+}
+
+
+function hideMessage() {
+
+    message.style.display =
+        "none";
+
+}
+
+
+function capitalize(text) {
+
+    if (!text) {
+        return "-";
+    }
+
+    return text
+        .charAt(0)
+        .toUpperCase()
+        + text.slice(1);
+
+}
+
+</script>
+
+
+</body>
+
+</html>

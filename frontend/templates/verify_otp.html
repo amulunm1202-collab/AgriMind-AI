@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Verify OTP | AgriMind AI</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 0;
+
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #f4faf5;
+}
+
+.card {
+    width: 420px;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,0.10);
+
+    text-align: center;
+}
+
+.icon {
+    font-size: 48px;
+
+    margin-bottom: 15px;
+}
+
+h1 {
+    color: #176b3a;
+
+    margin-bottom: 10px;
+}
+
+p {
+    color: #777;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    margin-bottom: 25px;
+}
+
+.email {
+    color: #176b3a;
+
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+
+    padding: 15px;
+
+    border: 1px solid #d5dfd8;
+
+    border-radius: 9px;
+
+    text-align: center;
+
+    font-size: 22px;
+
+    letter-spacing: 7px;
+
+    margin-bottom: 18px;
+
+    outline: none;
+}
+
+input:focus {
+    border-color: #176b3a;
+}
+
+button {
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #176b3a;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.resend {
+    display: block;
+
+    margin-top: 20px;
+
+    color: #176b3a;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    text-decoration: none;
+}
+
+.message {
+    padding: 10px;
+
+    border-radius: 8px;
+
+    margin-bottom: 15px;
+
+    font-size: 13px;
+}
+
+.error {
+    background: #ffecec;
+
+    color: #a33;
+}
+
+.success {
+    background: #eaf8ee;
+
+    color: #176b3a;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="icon">
+        📩
+    </div>
+
+    <h1>
+        Verify Your Email
+    </h1>
+
+    <p>
+
+        We sent a 6-digit OTP to
+
+        <br>
+
+        <span class="email">
+            {{ email }}
+        </span>
+
+    </p>
+
+
+    {% with messages =
+        get_flashed_messages(
+            with_categories=true
+        )
+    %}
+
+        {% for category, message in messages %}
+
+            <div class="message {{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    {% if purpose == "registration" %}
+
+        <form
+            method="POST"
+            action="/verify-registration">
+
+    {% else %}
+
+        <form
+            method="POST"
+            action="/verify-reset-otp">
+
+    {% endif %}
+
+
+        <input
+            type="text"
+            name="otp"
+            maxlength="6"
+            inputmode="numeric"
+            placeholder="000000"
+            required>
+
+
+        <button type="submit">
+            Verify OTP
+        </button>
+
+    </form>
+
+
+    {% if purpose == "registration" %}
+
+        <a
+            href="/resend-registration-otp"
+            class="resend">
+
+            Resend OTP
+
+        </a>
+
+    {% else %}
+
+        <a
+            href="/resend-reset-otp"
+            class="resend">
+
+            Resend OTP
+
+        </a>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>
