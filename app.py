@@ -139,65 +139,309 @@ app = Flask(
 app.secret_key = "agrimind-ai-development-key"
 
 CORS(app)
+# ============================================================
+# DATABASE - AGRIMIND AI
+# RENDER SAFE SQLITE DATABASE
+# ============================================================
+
+import os
+import sqlite3
 
 
 # ============================================================
-# DATABASE
+# BASE DIRECTORY
+# ============================================================
+
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
+
+
+# ============================================================
+# DATABASE DIRECTORY
+# ============================================================
+
+DATABASE_DIR = os.path.join(
+    BASE_DIR,
+    "database"
+)
+
+
+# ============================================================
+# DATABASE FILE
+# ============================================================
+
+DATABASE_PATH = os.path.join(
+    DATABASE_DIR,
+    "agrimind.db"
+)
+
+
+# ============================================================
+# GET DATABASE CONNECTION
 # ============================================================
 
 def get_db():
 
+    # Create database folder
     os.makedirs(
         DATABASE_DIR,
         exist_ok=True
     )
 
+    # Open SQLite database
     connection = sqlite3.connect(
-        DATABASE_PATH
+        DATABASE_PATH,
+        timeout=30
     )
 
+    # Return rows as dictionary-like objects
     connection.row_factory = sqlite3.Row
 
     return connection
 
 
+# ============================================================
+# INITIALIZE DATABASE
+# ============================================================
+
 def init_database():
 
-    connection = get_db()
+    print()
+    print("==============================================")
+    print("        INITIALIZING AGRIMIND DATABASE")
+    print("==============================================")
 
-    cursor = connection.cursor()
+    connection = None
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            security_question TEXT,
-            security_answer TEXT,
-            created_at TEXT NOT NULL
+    try:
+
+        # ----------------------------------------------------
+        # CONNECT TO DATABASE
+        # ----------------------------------------------------
+
+        connection = get_db()
+
+        print(
+            "Database path:",
+            DATABASE_PATH
         )
-    """)
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS soil_sensor_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nitrogen REAL NOT NULL,
-            phosphorus REAL NOT NULL,
-            potassium REAL NOT NULL,
-            ph REAL NOT NULL,
-            moisture REAL NOT NULL,
-            received_at TEXT NOT NULL
+
+        cursor = connection.cursor()
+
+
+        # ====================================================
+        # USERS TABLE
+        # ====================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                full_name TEXT NOT NULL,
+
+                email TEXT UNIQUE NOT NULL,
+
+                password TEXT NOT NULL,
+
+                security_question TEXT,
+
+                security_answer TEXT,
+
+                created_at TEXT NOT NULL
+
+            )
+        """)
+
+
+        # ====================================================
+        # SOIL SENSOR DATA TABLE
+        # ====================================================
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS soil_sensor_data (
+
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                nitrogen REAL NOT NULL,
+
+                phosphorus REAL NOT NULL,
+
+                potassium REAL NOT NULL,
+
+                ph REAL NOT NULL,
+
+                moisture REAL NOT NULL,
+
+                received_at TEXT NOT NULL
+
+            )
+        """)
+
+
+        # ====================================================
+        # SAVE DATABASE CHANGES
+        # ====================================================
+
+        connection.commit()
+
+
+        # ====================================================
+        # VERIFY USERS TABLE
+        # ====================================================
+
+        cursor.execute("""
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'table'
+            AND name = 'users'
+        """)
+
+        users_table = cursor.fetchone()
+
+
+        if users_table is None:
+
+            raise RuntimeError(
+                "USERS TABLE WAS NOT CREATED."
+            )
+
+
+        print(
+            "✓ users table ready."
         )
-    """)
-
-    connection.commit()
-
-    connection.close()
-
-    print("Database initialized.")
 
 
+        # ====================================================
+        # VERIFY SOIL SENSOR TABLE
+        # ====================================================
+
+        cursor.execute("""
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'table'
+            AND name = 'soil_sensor_data'
+        """)
+
+        soil_table = cursor.fetchone()
+
+
+        if soil_table is None:
+
+            raise RuntimeError(
+                "SOIL SENSOR TABLE WAS NOT CREATED."
+            )
+
+
+        print(
+            "✓ soil_sensor_data table ready."
+        )
+
+
+        # ====================================================
+        # VERIFY DATABASE CONNECTION
+        # ====================================================
+
+        cursor.execute(
+            "SELECT 1"
+        )
+
+        test_result = cursor.fetchone()
+
+
+        if test_result is None:
+
+            raise RuntimeError(
+                "DATABASE TEST QUERY FAILED."
+            )
+
+
+        print(
+            "✓ Database connection verified."
+        )
+
+
+        # ====================================================
+        # FINAL SUCCESS MESSAGE
+        # ====================================================
+
+        print("----------------------------------------------")
+
+        print(
+            "✓ DATABASE INITIALIZATION SUCCESSFUL"
+        )
+
+        print(
+            "Database:",
+            DATABASE_PATH
+        )
+
+        print(
+            "✓ users table ready"
+        )
+
+        print(
+            "✓ soil_sensor_data table ready"
+        )
+
+        print("==============================================")
+        print()
+
+
+    except Exception as error:
+
+        print()
+        print("==============================================")
+        print("❌ DATABASE INITIALIZATION FAILED")
+        print("==============================================")
+
+        print(
+            "Error:",
+            error
+        )
+
+        print(
+            "Database:",
+            DATABASE_PATH
+        )
+
+        print("==============================================")
+        print()
+
+        # Stop application startup if database
+        # initialization fails
+        raise
+
+
+    finally:
+
+        if connection is not None:
+
+            connection.close()
+
+
+# ============================================================
+# INITIALIZE DATABASE WHEN APPLICATION STARTS
+# ============================================================
+
+try:
+
+    init_database()
+
+except Exception as error:
+
+    print()
+    print(
+        "❌ APPLICATION DATABASE STARTUP FAILED"
+    )
+
+    print(
+        error
+    )
+
+    raise
 # ============================================================
 # SECURITY QUESTIONS
 # ============================================================
