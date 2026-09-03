@@ -1,85 +1,169 @@
 # ============================================================
-# AGRIMIND AI - LIGHTWEIGHT DISEASE DETECTION
-# NO TENSORFLOW
-# RENDER SAFE VERSION
+# AGRIMIND AI - PLANT DISEASE DETECTION
 # ============================================================
 
 import os
-from PIL import Image, ImageStat
+import numpy as np
+from PIL import Image
 
 
 # ============================================================
-# BASE DIRECTORY
+# PATHS
 # ============================================================
 
 BASE_DIR = os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
 )
 
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "models",
+    "plant_disease_model.keras"
+)
 
-# ============================================================
-# IMAGE SETTINGS
-# ============================================================
-
-ALLOWED_EXTENSIONS = {
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".webp"
-}
+IMAGE_SIZE = (128, 128)
 
 
 # ============================================================
-# DISEASE DATABASE
+# MODEL
 # ============================================================
 
-DISEASE_DATABASE = {
-
-    "healthy": {
-        "severity": "Low",
-        "description":
-            "The submitted crop image does not show strong "
-            "visual symptoms of a plant disease.",
-        "action":
-            "Continue regular crop monitoring and maintain "
-            "proper irrigation and field hygiene."
-    },
-
-    "leaf_spot": {
-        "severity": "Medium",
-        "description":
-            "The image shows visual patterns that may be "
-            "consistent with leaf spot symptoms.",
-        "action":
-            "Inspect affected leaves carefully and remove "
-            "severely affected plant material when appropriate."
-    },
-
-    "yellowing": {
-        "severity": "Medium",
-        "description":
-            "Yellowing patterns were observed in the submitted "
-            "crop image.",
-        "action":
-            "Check irrigation, nutrient availability and the "
-            "underside of leaves for possible pest activity."
-    },
-
-    "possible_blight": {
-        "severity": "High",
-        "description":
-            "The image contains dark or irregular leaf regions "
-            "that may be associated with a possible blight-like "
-            "symptom.",
-        "action":
-            "Inspect nearby plants and consult crop-specific "
-            "disease management guidance."
-    }
-}
+model = None
 
 
 # ============================================================
-# IMAGE VALIDATION
+# PLANTVILLAGE CLASSES
+# ============================================================
+
+CLASS_NAMES = [
+    "Apple___Apple_scab",
+    "Apple___Black_rot",
+    "Apple___Cedar_apple_rust",
+    "Apple___healthy",
+    "Blueberry___healthy",
+    "Cherry_(including_sour)___Powdery_mildew",
+    "Cherry_(including_sour)___healthy",
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+    "Corn_(maize)___Common_rust_",
+    "Corn_(maize)___Northern_Leaf_Blight",
+    "Corn_(maize)___healthy",
+    "Grape___Black_rot",
+    "Grape___Esca_(Black_Measles)",
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+    "Grape___healthy",
+    "Orange___Haunglongbing_(Citrus_greening)",
+    "Peach___Bacterial_spot",
+    "Peach___healthy",
+    "Pepper,_bell___Bacterial_spot",
+    "Pepper,_bell___healthy",
+    "Potato___Early_blight",
+    "Potato___Late_blight",
+    "Potato___healthy",
+    "Raspberry___healthy",
+    "Soybean___healthy",
+    "Squash___Powdery_mildew",
+    "Strawberry___Leaf_scorch",
+    "Strawberry___healthy",
+    "Tomato___Bacterial_spot",
+    "Tomato___Early_blight",
+    "Tomato___Late_blight",
+    "Tomato___Leaf_Mold",
+    "Tomato___Septoria_leaf_spot",
+    "Tomato___Spider_mites Two-spotted_spider_mite",
+    "Tomato___Target_Spot",
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+    "Tomato___Tomato_mosaic_virus",
+    "Tomato___healthy"
+]
+
+
+# ============================================================
+# LOAD MODEL
+# ============================================================
+
+def get_model():
+
+    global model
+
+    if model is not None:
+        return model
+
+    if not os.path.isfile(MODEL_PATH):
+        raise FileNotFoundError(
+            f"Disease model not found:\n{MODEL_PATH}"
+        )
+
+    print("==============================================")
+    print("Loading PlantVillage disease model...")
+    print("==============================================")
+
+    try:
+        # TensorFlow is imported ONLY when prediction is needed.
+        import tensorflow as tf
+
+        # CPU only
+        try:
+            tf.config.set_visible_devices([], "GPU")
+        except Exception:
+            pass
+
+        # Reduce CPU usage
+        try:
+            tf.config.threading.set_intra_op_parallelism_threads(1)
+            tf.config.threading.set_inter_op_parallelism_threads(1)
+        except Exception:
+            pass
+
+        # Keras 3 is a standalone package that TensorFlow depends on;
+        # import it directly so Pylance can resolve its source (the
+        # `tensorflow.keras` lazy-loader module has no resolvable source).
+        import keras
+
+        model = keras.models.load_model(
+            MODEL_PATH,
+            compile=False
+        )
+
+        print("✓ Disease model loaded")
+        print("Input shape:", model.input_shape)
+        print("Output shape:", model.output_shape)
+
+        return model
+
+    except ImportError as error:
+
+        raise RuntimeError(
+            "TensorFlow is not installed. "
+            "Install TensorFlow in the active environment."
+        ) from error
+
+    except Exception as error:
+
+        print("❌ Disease model loading failed:")
+        print(error)
+
+        raise RuntimeError(
+            f"Unable to load disease model: {error}"
+        ) from error
+
+
+# ============================================================
+# CLEAN NAME
+# ============================================================
+
+def clean_disease_name(name):
+
+    return (
+        str(name)
+        .replace("___", " - ")
+        .replace("_", " ")
+    )
+
+
+# ============================================================
+# VALIDATE IMAGE
 # ============================================================
 
 def validate_image(image_path):
@@ -91,16 +175,7 @@ def validate_image(image_path):
 
     if not os.path.isfile(image_path):
         raise FileNotFoundError(
-            f"Image not found: {image_path}"
-        )
-
-    extension = os.path.splitext(
-        image_path
-    )[1].lower()
-
-    if extension not in ALLOWED_EXTENSIONS:
-        raise ValueError(
-            "Only JPG, JPEG, PNG and WEBP images are supported."
+            f"Image not found:\n{image_path}"
         )
 
     try:
@@ -112,16 +187,14 @@ def validate_image(image_path):
 
         raise ValueError(
             f"Invalid image: {error}"
-        )
+        ) from error
 
 
 # ============================================================
-# IMAGE ANALYSIS
+# PREPARE IMAGE
 # ============================================================
 
-def analyze_image(image_path):
-
-    validate_image(image_path)
+def prepare_image(image_path):
 
     try:
 
@@ -133,133 +206,87 @@ def analyze_image(image_path):
 
         raise ValueError(
             f"Unable to open image: {error}"
+        ) from error
+
+    image = image.resize(
+        IMAGE_SIZE,
+        Image.Resampling.LANCZOS
+    )
+
+    image_array = np.asarray(
+        image,
+        dtype=np.float32
+    )
+
+    image_array /= 255.0
+
+    image_array = np.expand_dims(
+        image_array,
+        axis=0
+    )
+
+    return image_array
+
+
+# ============================================================
+# PREDICTION PROBABILITIES
+# ============================================================
+
+def get_probabilities(predictions):
+
+    predictions = np.asarray(
+        predictions,
+        dtype=np.float32
+    )
+
+    if predictions.ndim == 2:
+        probabilities = predictions[0]
+
+    elif predictions.ndim == 1:
+        probabilities = predictions
+
+    else:
+        raise RuntimeError(
+            f"Unexpected model output shape: "
+            f"{predictions.shape}"
         )
 
-    # Keep processing lightweight
-    image.thumbnail(
-        (256, 256)
+    if len(probabilities) != len(CLASS_NAMES):
+
+        raise RuntimeError(
+            f"Model returned {len(probabilities)} classes, "
+            f"but {len(CLASS_NAMES)} class names are configured."
+        )
+
+    # If already probabilities, use them.
+    total = float(
+        np.sum(probabilities)
     )
 
-    statistics = ImageStat.Stat(
-        image
+    if (
+        np.all(probabilities >= 0)
+        and
+        np.all(probabilities <= 1)
+        and
+        abs(total - 1.0) < 0.05
+    ):
+        return probabilities
+
+    # Otherwise apply softmax.
+    shifted = (
+        probabilities
+        -
+        np.max(probabilities)
     )
 
-    red = statistics.mean[0]
-    green = statistics.mean[1]
-    blue = statistics.mean[2]
-
-    brightness = (
-        red +
-        green +
-        blue
-    ) / 3
-
-    return {
-        "red": red,
-        "green": green,
-        "blue": blue,
-        "brightness": brightness
-    }
-
-
-# ============================================================
-# LIGHTWEIGHT DISEASE ANALYSIS
-# ============================================================
-
-def detect_visual_condition(image_path):
-
-    values = analyze_image(
-        image_path
+    exp_values = np.exp(
+        shifted
     )
 
-    red = values["red"]
-    green = values["green"]
-    blue = values["blue"]
-    brightness = values["brightness"]
-
-
-    # --------------------------------------------------------
-    # Very dark image
-    # --------------------------------------------------------
-
-    if brightness < 45:
-
-        return "possible_blight", 55.0
-
-
-    # --------------------------------------------------------
-    # Strong reddish / brownish appearance
-    # --------------------------------------------------------
-
-    if (
-        red > green * 1.25
-        and
-        red > blue * 1.20
-    ):
-
-        return "possible_blight", 62.0
-
-
-    # --------------------------------------------------------
-    # Yellowing appearance
-    # --------------------------------------------------------
-
-    if (
-        red > blue * 1.35
-        and
-        green > blue * 1.20
-        and
-        red > 80
-    ):
-
-        return "yellowing", 60.0
-
-
-    # --------------------------------------------------------
-    # Green dominant image
-    # --------------------------------------------------------
-
-    if (
-        green > red * 1.05
-        and
-        green > blue * 1.10
-    ):
-
-        return "healthy", 70.0
-
-
-    # --------------------------------------------------------
-    # Otherwise possible leaf spot
-    # --------------------------------------------------------
-
-    return "leaf_spot", 55.0
-
-
-# ============================================================
-# CLEAN DISEASE NAME
-# ============================================================
-
-def clean_disease_name(name):
-
-    names = {
-
-        "healthy":
-            "Healthy",
-
-        "leaf_spot":
-            "Possible Leaf Spot",
-
-        "yellowing":
-            "Possible Leaf Yellowing",
-
-        "possible_blight":
-            "Possible Blight"
-
-    }
-
-    return names.get(
-        name,
-        "Possible Plant Disease"
+    return (
+        exp_values
+        /
+        np.sum(exp_values)
     )
 
 
@@ -270,95 +297,122 @@ def clean_disease_name(name):
 def predict_disease(image_path):
 
     print("==============================================")
-    print("Lightweight disease prediction requested")
+    print("Disease prediction requested")
     print("Image:", image_path)
     print("==============================================")
 
+    # Validate
+    validate_image(
+        image_path
+    )
+
+    # Prepare image
+    image_array = prepare_image(
+        image_path
+    )
+
+    # Load model only now
+    current_model = get_model()
 
     try:
 
-        condition, confidence = (
-            detect_visual_condition(
-                image_path
-            )
+        predictions = current_model.predict(
+            image_array,
+            verbose=0
         )
-
-        information = DISEASE_DATABASE[
-            condition
-        ]
-
-        disease_name = clean_disease_name(
-            condition
-        )
-
-
-        result = {
-
-            "disease":
-                disease_name,
-
-            "confidence":
-                round(
-                    confidence,
-                    2
-                ),
-
-            "severity":
-                information["severity"],
-
-            "description":
-                information["description"],
-
-            "recommended_action":
-                information["action"],
-
-            "class_index":
-                0,
-
-            "top_predictions": [
-
-                {
-                    "disease":
-                        disease_name,
-
-                    "confidence":
-                        round(
-                            confidence,
-                            2
-                        )
-                }
-
-            ],
-
-            "model_status":
-                "Lightweight Render-compatible disease analysis"
-
-        }
-
-
-        print(
-            "Disease:",
-            disease_name
-        )
-
-        print(
-            "Confidence:",
-            confidence
-        )
-
-        return result
-
 
     except Exception as error:
 
-        print(
-            "❌ Disease detection error:",
-            error
-        )
+        print("❌ Disease prediction failed:")
+        print(error)
 
         raise RuntimeError(
             f"Disease prediction failed: {error}"
-        )
+        ) from error
+
+    # Convert output to probabilities
+    probabilities = get_probabilities(
+        predictions
+    )
+
+    # Best class
+    predicted_index = int(
+        np.argmax(probabilities)
+    )
+
+    confidence = float(
+        probabilities[predicted_index]
+    )
+
+    disease = CLASS_NAMES[
+        predicted_index
+    ]
+
+    # ========================================================
+    # TOP 3
+    # ========================================================
+
+    top_indices = np.argsort(
+        probabilities
+    )[::-1][:3]
+
+    top_predictions = []
+
+    for index in top_indices:
+
+        index = int(index)
+
+        top_predictions.append({
+
+            "disease":
+                clean_disease_name(
+                    CLASS_NAMES[index]
+                ),
+
+            "confidence":
+                round(
+                    float(
+                        probabilities[index]
+                    ) * 100,
+                    2
+                )
+        })
+
+    # ========================================================
+    # RESULT
+    # ========================================================
+
+    result = {
+
+        "disease":
+            clean_disease_name(
+                disease
+            ),
+
+        "confidence":
+            round(
+                confidence * 100,
+                2
+            ),
+
+        "class_index":
+            predicted_index,
+
+        "top_predictions":
+            top_predictions,
+
+        "model_status":
+            "PlantVillage disease model"
+    }
+
+    print("✓ Disease:", result["disease"])
+    print(
+        "✓ Confidence:",
+        result["confidence"],
+        "%"
+    )
+
+    return result
 
 
 # ============================================================

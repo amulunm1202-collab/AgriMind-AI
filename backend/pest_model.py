@@ -1,124 +1,90 @@
 # ============================================================
-# AGRIMIND AI - YOLO PEST DETECTION
-# RENDER CPU / LOW MEMORY VERSION
+# AGRIMIND AI - PEST DETECTION
 # ============================================================
 
 import os
 from PIL import Image
 
+
 # ============================================================
-# BASE DIRECTORY
+# PATHS
 # ============================================================
 
 BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
-
-# ============================================================
-# MODEL PATH
-# ============================================================
-
-MODEL_PATH = os.path.abspath(
-    os.path.join(
-        BASE_DIR,
-        "..",
-        "models",
-        "pest_model.pt"
+    os.path.dirname(
+        os.path.abspath(__file__)
     )
 )
 
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "models",
+    "pest_model.pt"
+)
+
+
 # ============================================================
 # GLOBAL MODEL
-# LAZY LOADING
 # ============================================================
 
 model = None
 
-# ============================================================
-# ALLOWED IMAGE TYPES
-# ============================================================
-
-ALLOWED_EXTENSIONS = {
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".webp"
-}
 
 # ============================================================
-# PEST DATABASE
+# PEST INFORMATION
 # ============================================================
 
 PEST_DATABASE = {
 
+    "aphid": {
+        "severity": "Medium",
+        "description": "Aphids are small insects that feed on plant sap.",
+        "action": "Inspect leaves and monitor the affected crop regularly."
+    },
+
     "aphids": {
         "severity": "Medium",
-        "description":
-            "Small insects that feed on plant sap and may "
-            "cause curling or yellowing of leaves.",
-        "action":
-            "Inspect the underside of leaves and follow "
-            "appropriate integrated pest management."
+        "description": "Aphids are small insects that feed on plant sap.",
+        "action": "Inspect leaves and monitor the affected crop regularly."
+    },
+
+    "whitefly": {
+        "severity": "Medium",
+        "description": "Whiteflies are small insects that feed on plant sap.",
+        "action": "Inspect the underside of leaves and monitor the crop."
     },
 
     "whiteflies": {
         "severity": "Medium",
-        "description":
-            "Small white insects that feed on plant sap and "
-            "may cause yellowing and reduced growth.",
-        "action":
-            "Monitor the underside of leaves and follow "
-            "appropriate integrated pest management."
+        "description": "Whiteflies are small insects that feed on plant sap.",
+        "action": "Inspect the underside of leaves and monitor the crop."
     },
 
     "thrips": {
         "severity": "Medium",
-        "description":
-            "Small insects that feed on plant tissue and may "
-            "cause silvery patches or distortion.",
-        "action":
-            "Inspect flowers and young leaves and follow "
-            "appropriate integrated pest management."
+        "description": "Thrips can damage young leaves and flowers.",
+        "action": "Inspect young leaves and flowers regularly."
     },
 
     "caterpillar": {
         "severity": "High",
-        "description":
-            "Leaf-eating larvae that can damage leaves and "
-            "young plant growth.",
-        "action":
-            "Inspect leaves for larvae and follow suitable "
-            "crop-specific management."
+        "description": "Caterpillars can eat leaves and damage crop growth.",
+        "action": "Inspect leaves for caterpillars and crop damage."
     },
 
     "beetle": {
         "severity": "Medium",
-        "description":
-            "Beetles can feed on leaves and create holes or "
-            "damaged leaf margins.",
-        "action":
-            "Inspect plants regularly and follow "
-            "crop-specific pest management."
+        "description": "Beetles may feed on leaves and cause visible damage.",
+        "action": "Inspect leaves and monitor the crop regularly."
     },
 
     "leaf miner": {
         "severity": "Medium",
-        "description":
-            "Larvae that create winding tunnels inside leaves.",
-        "action":
-            "Remove severely affected leaves and monitor "
-            "new growth."
-    },
-
-    "healthy": {
-        "severity": "Low",
-        "description":
-            "No pest was detected by the trained model in "
-            "the submitted image.",
-        "action":
-            "Continue regular crop monitoring."
+        "description": "Leaf miners create tunnels inside leaves.",
+        "action": "Remove severely affected leaves and monitor new growth."
     }
 }
+
 
 # ============================================================
 # LOAD YOLO MODEL
@@ -131,11 +97,10 @@ def get_model():
     if model is not None:
         return model
 
-    if not os.path.isfile(MODEL_PATH):
+    if not os.path.exists(MODEL_PATH):
 
         raise FileNotFoundError(
-            "Pest model not found.\n"
-            f"Expected location:\n{MODEL_PATH}"
+            f"Pest model not found:\n{MODEL_PATH}"
         )
 
     print("==============================================")
@@ -144,53 +109,52 @@ def get_model():
 
     try:
 
+        # Import only when model is actually needed
         from ultralytics import YOLO
 
         model = YOLO(MODEL_PATH)
 
-        print("✓ YOLO pest model loaded.")
+        print("✓ Pest model loaded")
         print("Classes:", model.names)
 
-    except Exception as error:
+        return model
 
-        print("❌ YOLO model loading failed:")
-        print(error)
+    except ImportError:
+
+        raise RuntimeError(
+            "Ultralytics is not installed. "
+            "Run: pip install ultralytics"
+        )
+
+    except Exception as error:
 
         raise RuntimeError(
             f"Unable to load pest model: {error}"
         )
 
-    return model
-
 
 # ============================================================
-# IMAGE VALIDATION
+# VALIDATE IMAGE
 # ============================================================
 
 def validate_image(image_path):
 
     if not image_path:
+
         raise ValueError(
-            "No image path provided."
+            "No image was provided."
         )
 
     if not os.path.isfile(image_path):
+
         raise FileNotFoundError(
-            f"Image not found: {image_path}"
-        )
-
-    extension = os.path.splitext(
-        image_path
-    )[1].lower()
-
-    if extension not in ALLOWED_EXTENSIONS:
-        raise ValueError(
-            "Only JPG, JPEG, PNG and WEBP images are supported."
+            f"Image not found:\n{image_path}"
         )
 
     try:
 
         with Image.open(image_path) as image:
+
             image.verify()
 
     except Exception as error:
@@ -201,7 +165,7 @@ def validate_image(image_path):
 
 
 # ============================================================
-# PEST INFORMATION
+# GET PEST INFORMATION
 # ============================================================
 
 def get_pest_information(pest_name):
@@ -210,35 +174,28 @@ def get_pest_information(pest_name):
         pest_name
     ).lower().strip()
 
+    # Exact match
     if name in PEST_DATABASE:
+
         return PEST_DATABASE[name]
 
-    if "aphid" in name:
-        return PEST_DATABASE["aphids"]
+    # Partial match
+    for key in PEST_DATABASE:
 
-    if "whitefly" in name or "white fly" in name:
-        return PEST_DATABASE["whiteflies"]
+        if key in name or name in key:
 
-    if "thrips" in name:
-        return PEST_DATABASE["thrips"]
+            return PEST_DATABASE[key]
 
-    if "caterpillar" in name:
-        return PEST_DATABASE["caterpillar"]
-
-    if "beetle" in name:
-        return PEST_DATABASE["beetle"]
-
-    if "leaf miner" in name:
-        return PEST_DATABASE["leaf miner"]
-
+    # Unknown pest
     return {
+
         "severity": "Medium",
+
         "description":
-            "The trained YOLO model detected an "
-            "agricultural pest class.",
+            "The pest detection model identified an agricultural pest.",
+
         "action":
-            "Inspect the affected crop carefully and "
-            "follow crop-specific pest management."
+            "Inspect the affected crop and monitor it regularly."
     }
 
 
@@ -249,14 +206,16 @@ def get_pest_information(pest_name):
 def predict_pest(image_path):
 
     print("==============================================")
-    print("YOLO pest prediction requested")
+    print("Pest prediction requested")
     print("Image:", image_path)
     print("==============================================")
 
     # Validate image
-    validate_image(image_path)
+    validate_image(
+        image_path
+    )
 
-    # Load model only when required
+    # Load model
     current_model = get_model()
 
     try:
@@ -265,54 +224,48 @@ def predict_pest(image_path):
 
             source=image_path,
 
-            # CPU
             device="cpu",
 
-            # Lower image size = lower memory
-            imgsz=320,
+            imgsz=640,
 
-            # Detection threshold
-            conf=0.25,
-
-            # Only one image
-            batch=1,
+            conf=0.10,
 
             verbose=False
-
         )
 
     except Exception as error:
 
-        print("❌ YOLO prediction error:")
-        print(error)
-
         raise RuntimeError(
-            f"YOLO prediction failed: {error}"
+            f"Pest prediction failed: {error}"
         )
 
-    # ========================================================
-    # CHECK RESULT
-    # ========================================================
-
+    # No result
     if not results:
 
         return {
+
             "pest": "Healthy",
-            "confidence": 0.0,
+
+            "confidence": 0,
+
             "severity": "Low",
+
             "description":
-                PEST_DATABASE["healthy"]["description"],
+                "No pest was detected.",
+
             "recommended_action":
-                PEST_DATABASE["healthy"]["action"],
+                "Continue monitoring the crop.",
+
             "detections": [],
+
             "model_status":
-                "Real YOLO pest detection model"
+                "YOLO pest detection model"
         }
 
     result = results[0]
 
     # ========================================================
-    # NO DETECTION
+    # NO DETECTIONS
     # ========================================================
 
     if (
@@ -322,16 +275,23 @@ def predict_pest(image_path):
     ):
 
         return {
+
             "pest": "Healthy",
-            "confidence": 0.0,
+
+            "confidence": 0,
+
             "severity": "Low",
+
             "description":
-                PEST_DATABASE["healthy"]["description"],
+                "No pest was detected in the submitted image.",
+
             "recommended_action":
-                PEST_DATABASE["healthy"]["action"],
+                "Continue monitoring the crop.",
+
             "detections": [],
+
             "model_status":
-                "Real YOLO pest detection model"
+                "YOLO pest detection model"
         }
 
     # ========================================================
@@ -354,22 +314,22 @@ def predict_pest(image_path):
 
             class_name = result.names.get(
                 class_id,
-                f"Unknown class {class_id}"
+                f"Class {class_id}"
             )
 
             detections.append({
 
-                "pest": str(
-                    class_name
-                ),
+                "pest":
+                    str(class_name),
 
-                "confidence": round(
-                    confidence * 100,
-                    2
-                ),
+                "confidence":
+                    round(
+                        confidence * 100,
+                        2
+                    ),
 
-                "class_id": class_id
-
+                "class_id":
+                    class_id
             })
 
         except Exception as error:
@@ -380,41 +340,52 @@ def predict_pest(image_path):
             )
 
     # ========================================================
-    # IF NOTHING COULD BE PROCESSED
+    # NO VALID DETECTIONS
     # ========================================================
 
     if not detections:
 
         return {
+
             "pest": "Healthy",
-            "confidence": 0.0,
+
+            "confidence": 0,
+
             "severity": "Low",
+
             "description":
-                PEST_DATABASE["healthy"]["description"],
+                "No pest was detected.",
+
             "recommended_action":
-                PEST_DATABASE["healthy"]["action"],
+                "Continue monitoring the crop.",
+
             "detections": [],
+
             "model_status":
-                "Real YOLO pest detection model"
+                "YOLO pest detection model"
         }
 
     # ========================================================
-    # SORT BY CONFIDENCE
+    # SORT
     # ========================================================
 
     detections.sort(
-        key=lambda item: item["confidence"],
+        key=lambda x: x["confidence"],
         reverse=True
     )
 
-    best_detection = detections[0]
+    best = detections[0]
 
-    detected_pest = best_detection["pest"]
+    pest_name = best["pest"]
 
-    confidence = best_detection["confidence"]
+    confidence = best["confidence"]
+
+    # ========================================================
+    # INFORMATION
+    # ========================================================
 
     information = get_pest_information(
-        detected_pest
+        pest_name
     )
 
     # ========================================================
@@ -424,7 +395,7 @@ def predict_pest(image_path):
     response = {
 
         "pest":
-            detected_pest,
+            pest_name,
 
         "confidence":
             confidence,
@@ -442,17 +413,16 @@ def predict_pest(image_path):
             detections,
 
         "model_status":
-            "Real YOLO pest detection model"
-
+            "YOLO pest detection model"
     }
 
     print(
-        "Detected pest:",
-        detected_pest
+        "✓ Pest:",
+        pest_name
     )
 
     print(
-        "Confidence:",
+        "✓ Confidence:",
         confidence,
         "%"
     )

@@ -1213,6 +1213,40 @@
 
                 </div>
 
+                <style>
+                    .management-btn {
+                        display: inline-flex; align-items: center; gap: 8px;
+                        margin-top: 20px; padding: 13px 22px;
+                        background: linear-gradient(135deg, #16a34a, #15803d);
+                        color: #fff; border: none; border-radius: 12px;
+                        font-size: 15px; font-weight: 600; cursor: pointer;
+                        box-shadow: 0 6px 18px rgba(22,163,74,.25);
+                        transition: transform .15s ease, box-shadow .15s ease;
+                    }
+                    .management-btn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 10px 24px rgba(22,163,74,.35);
+                    }
+                </style>
+
+                <button class="management-btn" onclick="goManagement('disease')">
+                    🛡️ View Management &amp; Prevention
+                </button>
+
+                <script>
+                    function goManagement(type) {
+                        var conf = parseFloat(
+                            document.getElementById("diseaseConfidence").textContent.replace("%", "")
+                        ) || "";
+                        window.location.href =
+                            "/crop-health-management?type=" + type +
+                            "&problem=" + encodeURIComponent(
+                                document.getElementById("diseaseName").textContent
+                            ) +
+                            "&confidence=" + encodeURIComponent(conf);
+                    }
+                </script>
+
             </div>
 
         </div>

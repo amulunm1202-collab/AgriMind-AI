@@ -10,218 +10,521 @@
 
 <title>Login | AgriMind AI</title>
 
+<link rel="preconnect"
+      href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
 <style>
 
-* {
-    box-sizing: border-box;
+    :root {
+        --bg-1:      #04100a;
+        --bg-2:      #081c12;
+        --bg-3:      #0f2b1c;
+        --accent:    #3cff9d;
+        --accent-2:  #29e6cf;
+        --accent-dim: rgba(60, 255, 157, 0.14);
+        --glass:     rgba(8, 22, 15, 0.55);
+        --glass-2:   rgba(8, 22, 15, 0.78);
+        --line:      rgba(140, 255, 200, 0.16);
+        --ink:       #eafff3;
+        --ink-soft:  #8fd0b0;
+        --ink-dim:   #6fa78f;
+        --danger:    #ff6b6b;
+        --danger-bg: rgba(255, 90, 90, 0.14);
+        --success:   #3cff9d;
+        --success-bg: rgba(60, 255, 157, 0.12);
+        --font-display: "Orbitron", "Segoe UI", sans-serif;
+        --font-body:    "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+    }
 
-    margin: 0;
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-    padding: 0;
+    html, body {
+        height: 100%;
+    }
 
-    font-family: Arial, sans-serif;
-}
+    body {
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: #040906;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
 
-body {
-    min-height: 100vh;
+    /* ------- Scene layers ------- */
 
-    display: flex;
+    .scene {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        background:
+            radial-gradient(1200px 800px at 50% -10%, var(--bg-3), transparent 62%),
+            linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    }
 
-    align-items: center;
+    #bg-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
 
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #eef8f0,
-            #f8fcf9
+    .scanlines {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.035) 0 1px,
+            transparent 1px 3px
         );
-}
-
-.card {
-    width: 420px;
-
-    background: white;
-
-    padding: 40px;
-
-    border-radius: 22px;
-
-    box-shadow:
-        0 15px 40px
-        rgba(0,0,0,0.10);
-}
-
-.logo {
-    text-align: center;
-
-    font-size: 40px;
-
-    margin-bottom: 8px;
-}
-
-.brand {
-    text-align: center;
-
-    color: #176b3a;
-
-    font-size: 28px;
-
-    font-weight: bold;
-
-    margin-bottom: 8px;
-}
-
-.subtitle {
-    text-align: center;
-
-    color: #777;
-
-    font-size: 14px;
-
-    margin-bottom: 28px;
-}
-
-label {
-    display: block;
-
-    color: #444;
-
-    font-size: 14px;
-
-    font-weight: bold;
-
-    margin-bottom: 7px;
-}
-
-input {
-    width: 100%;
-
-    padding: 13px;
-
-    border: 1px solid #d5dfd8;
-
-    border-radius: 9px;
-
-    outline: none;
-
-    margin-bottom: 17px;
-}
-
-input:focus {
-    border-color: #176b3a;
-}
-
-.password-row {
-    position: relative;
-}
-
-.password-row input {
-    padding-right: 55px;
-}
-
-.show-password {
-    position: absolute;
-
-    right: 12px;
-
-    top: 11px;
-
-    border: none;
-
-    background: transparent;
-
-    color: #176b3a;
-
-    cursor: pointer;
-
-    font-size: 18px;
-}
-
-.forgot {
-    text-align: right;
-
-    margin-top: -7px;
-
-    margin-bottom: 20px;
-}
-
-.forgot a {
-    color: #176b3a;
-
-    text-decoration: none;
-
-    font-size: 13px;
-
-    font-weight: bold;
-}
-
-.login-button {
-    width: 100%;
-
-    border: none;
-
-    padding: 14px;
-
-    border-radius: 9px;
-
-    background: #176b3a;
-
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-}
-
-.login-button:hover {
-    background: #12572f;
-}
-
-.message {
-    padding: 10px;
-
-    border-radius: 8px;
-
-    margin-bottom: 15px;
-
-    text-align: center;
-
-    font-size: 13px;
-}
-
-.error {
-    background: #ffecec;
-
-    color: #a33;
-}
-
-.success {
-    background: #eaf8ee;
-
-    color: #176b3a;
-}
-
-.create {
-    text-align: center;
-
-    margin-top: 23px;
-
-    color: #666;
-
-    font-size: 14px;
-}
-
-.create a {
-    color: #176b3a;
-
-    font-weight: bold;
-
-    text-decoration: none;
-}
+        mix-blend-mode: overlay;
+        opacity: 0.5;
+    }
+
+    .vignette {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(
+            120% 110% at 50% 50%,
+            transparent 55%,
+            rgba(0, 0, 0, 0.6) 100%
+        );
+    }
+
+    .glow-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(70px);
+        opacity: 0.32;
+        pointer-events: none;
+        will-change: transform;
+    }
+
+    .orb-1 {
+        width: 440px;
+        height: 440px;
+        background: var(--accent);
+        top: -120px;
+        left: -80px;
+        animation: orbFloat 16s ease-in-out infinite;
+    }
+
+    .orb-2 {
+        width: 380px;
+        height: 380px;
+        background: var(--accent-2);
+        bottom: -100px;
+        right: -70px;
+        animation: orbFloat 19s ease-in-out infinite reverse;
+    }
+
+    @keyframes orbFloat {
+        0%, 100% { transform: translate(0, 0); }
+        50%      { transform: translate(34px, -26px); }
+    }
+
+    /* ------- Floating farm-tech glyphs ------- */
+
+    .glyph {
+        position: absolute;
+        z-index: 1;
+        pointer-events: none;
+        color: var(--accent);
+        opacity: 0.55;
+        text-shadow: 0 0 16px rgba(60, 255, 157, 0.55);
+        filter: drop-shadow(0 0 12px var(--accent-dim));
+        animation: glyphFloat 11s ease-in-out infinite;
+        will-change: transform;
+    }
+
+    .glyph .lab {
+        position: absolute;
+        left: 50%;
+        top: 100%;
+        transform: translateX(-50%);
+        font-family: var(--font-display);
+        font-size: 8px;
+        letter-spacing: 2px;
+        color: var(--ink-dim);
+        text-shadow: none;
+        white-space: nowrap;
+        margin-top: 4px;
+    }
+
+    .g1 { top: 16%; left: 11%; font-size: 34px; animation-delay: 0s; }
+    .g2 { top: 22%; right: 13%; font-size: 30px; animation-delay: -2s; }
+    .g3 { bottom: 22%; left: 15%; font-size: 36px; animation-delay: -4s; }
+    .g4 { bottom: 18%; right: 17%; font-size: 30px; animation-delay: -1s; }
+    .g5 { top: 48%; left: 6%;   font-size: 28px; animation-delay: -3s; }
+    .g6 { top: 55%; right: 7%;  font-size: 28px; animation-delay: -5s; }
+    .g7 { top: 8%;  left: 44%;  font-size: 24px; animation-delay: -6s; }
+    .g8 { bottom: 6%; left: 40%; font-size: 26px; animation-delay: -2.5s; }
+
+    @keyframes glyphFloat {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50%      { transform: translateY(-24px) rotate(4deg); }
+    }
+
+    /* ------- Content / card ------- */
+
+    .scene-content {
+        position: relative;
+        z-index: 2;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
+    }
+
+    .tilt-wrap {
+        perspective: 1300px;
+    }
+
+    .card {
+        position: relative;
+        width: min(400px, 94vw);
+        padding: 38px 34px 30px;
+        border-radius: 22px;
+        background: var(--glass);
+        border: 1px solid var(--line);
+        box-shadow:
+            0 30px 80px -30px rgba(0, 0, 0, 0.85),
+            inset 0 0 60px rgba(60, 255, 157, 0.05);
+        backdrop-filter: blur(18px) saturate(140%);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        transform-style: preserve-3d;
+        transition: transform 0.12s ease-out;
+        will-change: transform;
+    }
+
+    .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(
+            135deg,
+            rgba(60, 255, 157, 0.55),
+            rgba(41, 230, 207, 0.16) 40%,
+            transparent 60%,
+            rgba(60, 255, 157, 0.3)
+        );
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+
+    .glare {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        background: radial-gradient(
+            620px 440px at var(--gx, 50%) var(--gy, 0%),
+            rgba(255, 255, 255, 0.13),
+            transparent 42%
+        );
+        mix-blend-mode: screen;
+        opacity: 0.85;
+    }
+
+    /* ------- Card header ------- */
+
+    .card-head {
+        text-align: center;
+        margin-bottom: 26px;
+    }
+
+    .brand-mark {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 14px;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        background: linear-gradient(135deg, rgba(60, 255, 157, 0.18), rgba(41, 230, 207, 0.08));
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        text-shadow: 0 0 18px rgba(60, 255, 157, 0.7);
+        box-shadow: 0 0 26px rgba(60, 255, 157, 0.18), inset 0 0 18px rgba(60, 255, 157, 0.08);
+    }
+
+    .brand-name {
+        font-family: var(--font-display);
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        color: var(--ink);
+        background: linear-gradient(180deg, #ffffff 0%, var(--accent) 70%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .brand-name em {
+        font-style: normal;
+        color: var(--accent-2);
+        background: none;
+        -webkit-text-fill-color: initial;
+        letter-spacing: 2px;
+    }
+
+    .eyebrow {
+        margin-top: 8px;
+        font-family: var(--font-display);
+        font-size: 10px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+    }
+
+    /* ------- Status chip ------- */
+
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 auto 20px;
+        padding: 6px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--glass-2);
+        font-family: var(--font-display);
+        font-size: 9px;
+        letter-spacing: 2px;
+        color: var(--ink-soft);
+    }
+
+    .status-chip .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--accent); }
+        50%      { opacity: 0.35; box-shadow: 0 0 3px var(--accent); }
+    }
+
+    /* ------- Flash messages ------- */
+
+    .message {
+        padding: 11px 14px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+        border: 1px solid transparent;
+        backdrop-filter: blur(6px);
+    }
+
+    .message.error {
+        background: var(--danger-bg);
+        color: var(--danger);
+        border-color: rgba(255, 90, 90, 0.3);
+    }
+
+    .message.success {
+        background: var(--success-bg);
+        color: var(--success);
+        border-color: rgba(60, 255, 157, 0.3);
+    }
+
+    /* ------- Form ------- */
+
+    .field {
+        margin-bottom: 17px;
+        text-align: left;
+    }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        color: var(--ink-soft);
+        margin-bottom: 7px;
+        text-transform: uppercase;
+    }
+
+    .control {
+        position: relative;
+    }
+
+    .control .icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ink-dim);
+        font-size: 15px;
+        pointer-events: none;
+    }
+
+    .control input {
+        width: 100%;
+        padding: 13px 44px 13px 44px;
+        font-family: var(--font-body);
+        font-size: 15px;
+        color: var(--ink);
+        background: var(--glass-2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .control input::placeholder {
+        color: var(--ink-dim);
+    }
+
+    .control input:focus {
+        border-color: var(--accent);
+        background: rgba(5, 14, 10, 0.7);
+        box-shadow:
+            0 0 0 3px var(--accent-dim),
+            0 0 20px rgba(60, 255, 157, 0.25);
+    }
+
+    .control.password input {
+        padding-right: 50px;
+    }
+
+    .show-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: var(--ink-soft);
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px;
+        border-radius: 8px;
+        line-height: 1;
+    }
+
+    .show-password:hover {
+        color: var(--accent);
+        background: var(--accent-dim);
+    }
+
+    .field-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: -2px 0 20px;
+    }
+
+    .forgot a {
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .forgot a:hover {
+        text-decoration: underline;
+        text-shadow: 0 0 12px var(--accent-dim);
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-family: var(--font-display);
+        font-size: 13px;
+        letter-spacing: 2px;
+        font-weight: 700;
+        color: #041507;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 10px 30px -8px rgba(60, 255, 157, 0.7);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    .login-button::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -130%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.5s ease;
+    }
+
+    .login-button:hover {
+        filter: brightness(1.06);
+        transform: translateY(-1px);
+        box-shadow: 0 14px 36px -8px rgba(60, 255, 157, 0.85);
+    }
+
+    .login-button:hover::after {
+        left: 170%;
+    }
+
+    .create {
+        text-align: center;
+        margin-top: 22px;
+        font-size: 14px;
+        color: var(--ink-soft);
+    }
+
+    .create a {
+        color: var(--accent);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .create a:hover {
+        text-shadow: 0 0 12px var(--accent-dim);
+    }
+
+    .legal {
+        margin-top: 16px;
+        text-align: center;
+        font-size: 11px;
+        color: var(--ink-dim);
+    }
+
+    /* ------- Responsive ------- */
+
+    @media (max-width: 640px) {
+        .glyph { opacity: 0.32; }
+        .glyph .lab { display: none; }
+        .g1, .g2, .g5, .g7 { font-size: 24px; }
+        .g3, .g4, .g6, .g8 { font-size: 26px; }
+        .card { padding: 30px 24px 26px; }
+        .brand-name { font-size: 21px; letter-spacing: 3px; }
+    }
 
 </style>
 
@@ -229,133 +532,336 @@ input:focus {
 
 <body>
 
-<div class="card">
+<div class="scene">
 
-    <div class="logo">
-        🌱
-    </div>
+    <canvas id="bg-canvas"></canvas>
 
-    <div class="brand">
-        AgriMind AI
-    </div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
 
-    <p class="subtitle">
-        Smart farming powered by artificial intelligence.
-    </p>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
 
-
-    {% with messages =
-        get_flashed_messages(
-            with_categories=true
-        )
-    %}
-
-        {% for category, message in messages %}
-
-            <div class="message {{ category }}">
-                {{ message }}
-            </div>
-
-        {% endfor %}
-
-    {% endwith %}
-
-
-    <form
-        method="POST"
-        action="/login">
-
-
-        <label>
-            Email Address
-        </label>
-
-        <input
-            type="email"
-            name="email"
-            placeholder="Enter your email"
-            required>
-
-
-        <label>
-            Password
-        </label>
-
-        <div class="password-row">
-
-            <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Enter your password"
-                required>
-
-            <button
-                type="button"
-                class="show-password"
-                onclick="togglePassword()">
-
-                👁
-
-            </button>
-
-        </div>
-
-
-        <div class="forgot">
-
-            <a href="/forgot-password">
-                Forgot Password?
-            </a>
-
-        </div>
-
-
-        <button
-            type="submit"
-            class="login-button">
-
-            Login →
-
-        </button>
-
-    </form>
-
-
-    <div class="create">
-
-        Don't have an account?
-
-        <a href="/register">
-            Create Account
-        </a>
-
-    </div>
+    <div class="glyph g1">🌱<span class="lab">SPROUT</span></div>
+    <div class="glyph g2">🛰<span class="lab">SATELLITE</span></div>
+    <div class="glyph g3">🚁<span class="lab">AERIAL</span></div>
+    <div class="glyph g4">📡<span class="lab">SENSOR</span></div>
+    <div class="glyph g5">🌾<span class="lab">CROP</span></div>
+    <div class="glyph g6">💧<span class="lab">IRRIGATION</span></div>
+    <div class="glyph g7">☁<span class="lab">WEATHER</span></div>
+    <div class="glyph g8">⚡<span class="lab">AUTOMATION</span></div>
 
 </div>
 
+<main class="scene-content">
+
+    <div class="tilt-wrap">
+
+        <div class="card" id="tilt-card">
+
+            <div class="glare" id="glare"></div>
+
+            <div class="card-head">
+                <div class="brand-mark">🌱</div>
+                <div class="brand-name">AGRIMIND <em>AI</em></div>
+                <div class="eyebrow">Precision Farming Platform</div>
+            </div>
+
+            <div style="text-align:center;">
+                <div class="status-chip">
+                    <span class="dot"></span>
+                    <span>SYSTEMS ONLINE</span>
+                </div>
+            </div>
+
+            {% with messages =
+                get_flashed_messages(
+                    with_categories=true
+                )
+            %}
+
+                {% for category, message in messages %}
+
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+            <form
+                method="POST"
+                action="/login">
+
+                <div class="field">
+                    <label for="login-email">Email address</label>
+                    <div class="control">
+                        <span class="icon">&#9993;</span>
+                        <input
+                            type="email"
+                            name="email"
+                            id="login-email"
+                            placeholder="you@example.com"
+                            autocomplete="username"
+                            required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <div class="control password">
+                        <span class="icon">&#128274;</span>
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+                        <button
+                            type="button"
+                            class="show-password"
+                            onclick="togglePassword()"
+                            aria-label="Show or hide password">
+                            <span id="eye-icon">👁</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <span></span>
+                    <span class="forgot">
+                        <a href="/forgot-password">Forgot password?</a>
+                    </span>
+                </div>
+
+                <button
+                    type="submit"
+                    class="login-button">
+                    SIGN IN
+                </button>
+
+            </form>
+
+            <p class="create">
+                Don't have an account?
+                <a href="/register">Create one</a>
+            </p>
+
+            <p class="legal">
+                Secured by AgriMind — your farm data stays private.
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
 
 <script>
 
-function togglePassword() {
+(function () {
 
-    const password =
-        document.getElementById(
-            "password"
-        );
+    "use strict";
 
-    if (
-        password.type === "password"
-    ) {
+    var reduceMotion =
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-        password.type = "text";
+    /* ============ Futuristic smart-farm canvas ============ */
 
-    } else {
+    var canvas = document.getElementById("bg-canvas");
+    var ctx = canvas.getContext("2d");
+    var W = 0, H = 0;
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
+    var particles = [];
+    var COUNT = window.innerWidth < 700 ? 42 : 78;
+    var t = 0;
+    var running = true;
 
-        password.type = "password";
-
+    function build() {
+        particles = [];
+        for (var i = 0; i < COUNT; i++) {
+            particles.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                vx: (Math.random() - 0.5) * 0.32,
+                vy: (Math.random() - 0.5) * 0.32,
+                r: Math.random() * 1.8 + 0.6,
+                c: Math.random() < 0.7 ? "60,255,157" : "41,230,207"
+            });
+        }
     }
 
+    function resize() {
+        W = canvas.clientWidth = window.innerWidth;
+        H = canvas.clientHeight = window.innerHeight;
+        canvas.width = W * DPR;
+        canvas.height = H * DPR;
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        build();
+    }
+
+    function horizon() {
+        return H * 0.62;
+    }
+
+    function drawGrid() {
+        var hy = horizon();
+        var bottom = H - hy;
+        var cx = W / 2;
+        var i, p, y;
+
+        ctx.save();
+
+        /* horizontal floor lines recede into perspective */
+        ctx.strokeStyle = "rgba(60,255,157,0.14)";
+        ctx.lineWidth = 1;
+        var N = 14;
+        var speed = 0.05;
+        for (i = 0; i < N; i++) {
+            p = ((i / N + t * speed) % 1);
+            y = hy + Math.pow(p, 2) * bottom;
+            ctx.globalAlpha = 0.12 * (1 - p * 0.55);
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y);
+            ctx.stroke();
+        }
+
+        /* vertical lines fanning from the vanishing point */
+        ctx.globalAlpha = 0.10;
+        var k;
+        for (k = -14; k <= 14; k++) {
+            var xb = cx + k * (W * 0.08);
+            if (xb < -60 || xb > W + 60) { continue; }
+            ctx.beginPath();
+            ctx.moveTo(cx, hy);
+            ctx.lineTo(xb, H);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    function drawSweep() {
+        var y = ((t * 0.045) % 1) * H;
+        var g = ctx.createLinearGradient(0, y - 34, 0, y + 34);
+        g.addColorStop(0, "rgba(60,255,157,0)");
+        g.addColorStop(0.5, "rgba(60,255,157,0.08)");
+        g.addColorStop(1, "rgba(60,255,157,0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, y - 34, W, 68);
+    }
+
+    function drawParticles() {
+        var i, j, a, b, dx, dy, d;
+
+        for (i = 0; i < particles.length; i++) {
+            a = particles[i];
+            if (running) {
+                a.x += a.vx;
+                a.y += a.vy;
+                if (a.x < 0) { a.x += W; }
+                if (a.x > W) { a.x -= W; }
+                if (a.y < 0) { a.y += H; }
+                if (a.y > H) { a.y -= H; }
+            }
+        }
+
+        /* data links between nearby sensors */
+        for (i = 0; i < particles.length; i++) {
+            a = particles[i];
+            for (j = i + 1; j < particles.length; j++) {
+                b = particles[j];
+                dx = a.x - b.x;
+                dy = a.y - b.y;
+                d = Math.sqrt(dx * dx + dy * dy);
+                if (d < 132) {
+                    ctx.strokeStyle = "rgba(60,255,157," + (0.14 * (1 - d / 132)).toFixed(3) + ")";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        /* glowing sensor nodes */
+        for (i = 0; i < particles.length; i++) {
+            a = particles[i];
+            ctx.fillStyle = "rgba(" + a.c + ",0.16)";
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.r * 3.6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "rgba(" + a.c + ",0.9)";
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function frame() {
+        ctx.clearRect(0, 0, W, H);
+        drawGrid();
+        drawSweep();
+        drawParticles();
+        t += 1;
+        if (running) {
+            requestAnimationFrame(frame);
+        }
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    if (reduceMotion) {
+        /* static single frame, no animation loop */
+        running = false;
+        frame();
+    } else {
+        requestAnimationFrame(frame);
+    }
+
+    /* ============ 3D mouse-tilt on the card ============ */
+
+    var card = document.getElementById("tilt-card");
+    var glare = document.getElementById("glare");
+    var wrap = document.querySelector(".tilt-wrap");
+    var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+
+    if (card && !reduceMotion && !coarse) {
+        var MAX = 8;
+        window.addEventListener("mousemove", function (e) {
+            var r = wrap.getBoundingClientRect();
+            var px = (e.clientX - r.left - r.width / 2) / (r.width / 2);
+            var py = (e.clientY - r.top - r.height / 2) / (r.height / 2);
+            card.style.transform =
+                "rotateY(" + (px * MAX).toFixed(2) + "deg) rotateX(" + (-py * MAX).toFixed(2) + "deg)";
+            glare.style.setProperty("--gx", ((px + 1) / 2 * 100).toFixed(1) + "%");
+            glare.style.setProperty("--gy", ((py + 1) / 2 * 100).toFixed(1) + "%");
+        });
+        window.addEventListener("mouseleave", function () {
+            card.style.transform = "rotateY(0deg) rotateX(0deg)";
+            glare.style.setProperty("--gx", "50%");
+            glare.style.setProperty("--gy", "0%");
+        });
+    }
+
+})();
+
+function togglePassword() {
+    var password = document.getElementById("password");
+    var eye = document.getElementById("eye-icon");
+    if (password.type === "password") {
+        password.type = "text";
+        eye.innerHTML = "&#128584;";
+    } else {
+        password.type = "password";
+        eye.innerHTML = "&#128065;";
+    }
 }
 
 </script>

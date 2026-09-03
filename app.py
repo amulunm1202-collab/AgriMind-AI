@@ -1,17 +1,17 @@
-import os
-
-# Render does not provide a GPU
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-
+# ============================================================
+# AGRIMIND AI - APP.PY
+# ============================================================
 
 import os
 import io
+import sys
+import time
 import json
 import random
 import sqlite3
 import urllib.request
 import urllib.parse
+import urllib.error
 
 from datetime import datetime
 
@@ -19,26 +19,67 @@ import requests
 import numpy as np
 from PIL import Image
 
-from dotenv import load_dotenv
-from google import genai
 # ============================================================
-# GEMINI AI SETUP
+# UTF-8 OUTPUT
+# Windows consoles use cp1252 by default, which cannot encode
+# the emoji / unicode symbols printed by AgriMind. Encode as
+# UTF-8 (with replacement) so those prints never crash.
 # ============================================================
 
-from dotenv import load_dotenv
-from google import genai
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
-load_dotenv()
+# ============================================================
+# ENVIRONMENT
+# ============================================================
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# dotenv is optional. When it is missing we simply rely on the
+# OS environment variables so the app can still start.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except Exception:
+    pass
+
+# Render has no GPU
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+# ============================================================
+# GEMINI AI
+# ============================================================
 
 client = None
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 if GEMINI_API_KEY:
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    print("✅ Gemini AI configured.")
+    try:
+        from google import genai
+
+        client = genai.Client(
+            api_key=GEMINI_API_KEY
+        )
+
+        print("✅ Gemini AI configured.")
+
+    except Exception as error:
+        print("⚠️ Gemini AI could not be initialized:")
+        print(error)
+        client = None
+
 else:
-    print("⚠️ Gemini AI is not configured. Continuing without Gemini.")
+    print("⚠️ Gemini AI is not configured.")
+    print("Continuing without Gemini.")
+
+# ============================================================
+# FLASK
+# ============================================================
+
 from flask import (
     Flask,
     render_template,
@@ -57,26 +98,32 @@ from werkzeug.security import (
     check_password_hash
 )
 
-
-
-
 # ============================================================
-# DISEASE MODEL
+# AGRIMIND BACKEND MODULES
 # ============================================================
 
+# Disease detection
 from backend.disease_model import predict_disease
 
-# ============================================================
-# AI FARMING ASSISTANT
-# ============================================================
+# AI farming assistant
+from backend.farming_assistant import (
+    get_farming_response as _rule_based_farming_response
+)
 
-from backend.farming_assistant import get_farming_response
-
-# ============================================================
-# REAL PEST MODEL
-# ============================================================
-
+# Pest detection
 from backend.pest_model import predict_pest
+
+# Disease & pest management / prevention
+from backend.management_prevention import (
+    get_disease_management,
+    get_pest_management
+)
+
+# Soil analysis
+from backend.soil_model import predict_soil_fertility
+
+# Crop recommendation
+from backend.crop_model import recommend_crop
 
 # ============================================================
 # REAL SOIL MODEL
@@ -1711,6 +1758,12 @@ def get_farming_response(message):
             "Please enter your farming question."
         )
 
+    # Gemini is optional; when it is not configured, use the
+    # built-in rule-based assistant directly (no error spam).
+    if client is None:
+
+        return _rule_based_farming_response(message)
+
     try:
 
         prompt = f"""
@@ -1768,10 +1821,14 @@ User question:
             repr(error)
         )
 
-        return (
-            "Sorry, I couldn't process your question right now. "
-            "Please try again."
-        )
+        # Fall back to the built-in rule-based assistant.
+        try:
+            return _rule_based_farming_response(message)
+        except Exception:
+            return (
+                "Sorry, I couldn't process your question right now. "
+                "Please try again."
+            )
 
 # ============================================================
 # WEATHER CONDITION
@@ -2070,10 +2127,37 @@ def create_weather_alert(
 # FETCH WEATHER
 # ============================================================
 
+# ------------------------------------------------------------------
+# Simple in-memory weather cache. The public Open-Meteo service
+# rate-limits (HTTP 429) when the same IP makes many forecast
+# requests in a short window. Caching a location's response for a
+# few minutes reduces request volume and avoids tripping that limit.
+# ------------------------------------------------------------------
+
+_WEATHER_CACHE = {}
+
+
 def fetch_weather(
     latitude,
     longitude
 ):
+
+    # ------------------------------------------------------------
+    # Return a fresh cached forecast when available
+    # ------------------------------------------------------------
+
+    cache_key = (
+        round(float(latitude), 2),
+        round(float(longitude), 2)
+    )
+
+    cached = _WEATHER_CACHE.get(
+        cache_key
+    )
+
+    if cached and cached["ts"] > time.time() - 600:
+
+        return cached["data"]
 
     params = urllib.parse.urlencode({
 
@@ -2121,21 +2205,465 @@ def fetch_weather(
         url,
 
         headers={
-            "User-Agent": "AgriMind-AI/1.0"
+            "User-Agent": "AgriMind-AI/1.0",
+            "Accept": "application/json"
         }
 
     )
 
-    with urllib.request.urlopen(
-        request_object,
-        timeout=10
-    ) as response:
+    # ========================================================
+    # RETRY / BACKOFF
+    # The public Open-Meteo service occasionally returns
+    # HTTP 429 (Too Many Requests) or transient network errors
+    # when many requests arrive from the same IP in a short
+    # window. Retry a few times with exponential backoff so a
+    # single transient failure does not break the whole page.
+    # ========================================================
 
-        return json.loads(
-            response.read().decode(
-                "utf-8"
+    last_error = None
+
+    for attempt in range(3):
+
+        try:
+
+            with urllib.request.urlopen(
+                request_object,
+                timeout=12
+            ) as response:
+
+                data = json.loads(
+                    response.read().decode(
+                        "utf-8"
+                    )
+                )
+
+                _WEATHER_CACHE[cache_key] = {
+                    "ts": time.time(),
+                    "data": data
+                }
+
+                return data
+
+        except urllib.error.HTTPError as error:
+
+            last_error = error
+
+            # Rate-limit: back off and retry, honouring
+            # the server's Retry-After header when present.
+            if error.code == 429:
+
+                # Open-Meteo also enforces a per-IP DAILY request
+                # cap. Once it is exhausted every retry returns the
+                # same 429 ("Daily API request limit exceeded."),
+                # so sleeping and retrying is pointless. Detect it
+                # and bail out at once so the fallback provider can
+                # answer without a multi-second delay.
+                try:
+
+                    error_reason = json.loads(
+                        error.read().decode(
+                            "utf-8",
+                            "replace"
+                        )
+                    ).get("reason", "")
+
+                except Exception:
+
+                    error_reason = ""
+
+                if (
+                    "daily" in error_reason.lower()
+                    and "limit" in error_reason.lower()
+                ):
+
+                    last_error = error
+
+                    break
+
+                retry_after = error.headers.get(
+                    "Retry-After"
+                ) if error.headers else None
+
+                try:
+
+                    delay = float(retry_after)
+
+                except (TypeError, ValueError):
+
+                    delay = float(2 ** attempt)
+
+                time.sleep(delay)
+
+                continue
+
+            raise
+
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as error:
+
+            last_error = error
+
+            time.sleep(
+                2 ** attempt
             )
+
+            continue
+
+    if last_error:
+
+        raise last_error
+
+    raise RuntimeError(
+        "Weather request failed."
+    )
+
+
+# ============================================================
+# WEATHER FALLBACK (wttr.in)
+# Open-Meteo is a free, key-less service but it enforces a
+# per-IP DAILY request quota. When that quota is exhausted the
+# primary fetch fails with a 429, so we fall back to wttr.in
+# (also key-less) and re-shape its response into the same
+# Open-Meteo structure the rest of the route already expects.
+# ============================================================
+
+_WEATHER_FALLBACK_CACHE = {}
+
+
+# WorldWeatherOnline / wttr.in weather codes -> WMO codes the
+# app already understands. Unknown codes default to 0 (Clear).
+_WWO_TO_WMO = {
+
+    113: 0,  # Sunny                          -> Clear Sky
+    116: 2,  # Partly cloudy
+    119: 3,  # Cloudy
+    122: 3,  # Overcast
+    143: 45, # Mist
+    176: 61, # Patchy rain nearby
+    179: 71, # Patchy snow nearby
+    182: 51, # Patchy sleet
+    185: 56, # Patchy freezing drizzle
+    200: 95, # Thundery outbreaks
+    227: 71, # Blowing snow
+    230: 75, # Blizzard
+    248: 45, # Fog
+    260: 48, # Freezing fog
+    263: 51, # Patchy light drizzle
+    266: 51, # Light drizzle
+    281: 56, # Freezing drizzle
+    284: 57, # Heavy freezing drizzle
+    293: 61, # Patchy light rain
+    296: 61, # Light rain
+    299: 63, # Moderate rain at times
+    302: 63, # Moderate rain
+    305: 65, # Heavy rain at times
+    308: 65, # Heavy rain
+    311: 66, # Light freezing rain
+    314: 67, # Heavy freezing rain
+    317: 71, # Light sleet
+    320: 71, # Moderate/heavy sleet
+    323: 71, # Patchy light snow
+    326: 71, # Light snow
+    329: 73, # Patchy moderate snow
+    332: 73, # Moderate snow
+    335: 75, # Patchy heavy snow
+    338: 75, # Heavy snow
+    350: 77, # Ice pellets
+    353: 80, # Light rain shower
+    356: 81, # Moderate rain shower
+    359: 82, # Torrential rain shower
+    362: 85, # Light sleet showers
+    365: 85, # Moderate sleet showers
+    368: 85, # Light snow showers
+    371: 86, # Moderate snow showers
+    374: 77, # Light ice pellet showers
+    377: 77, # Heavy ice pellet showers
+    386: 95, # Light rain thunder
+    389: 95, # Heavy rain thunder
+    392: 96, # Light snow thunder
+    395: 99, # Heavy snow thunder
+
+}
+
+
+def _wwo_to_wmo(code):
+
+    try:
+
+        return _WWO_TO_WMO.get(
+            int(code),
+            0
         )
+
+    except (TypeError, ValueError):
+
+        return 0
+
+
+def fetch_weather_fallback(
+    latitude,
+    longitude
+):
+
+    # ------------------------------------------------------------
+    # Return a fresh cached forecast when available
+    # ------------------------------------------------------------
+
+    cache_key = (
+        round(float(latitude), 2),
+        round(float(longitude), 2)
+    )
+
+    cached = _WEATHER_FALLBACK_CACHE.get(
+        cache_key
+    )
+
+    if cached and cached["ts"] > time.time() - 600:
+
+        return cached["data"]
+
+    url = "https://wttr.in/{lat},{lon}?format=j1&lang=en".format(
+        lat=latitude,
+        lon=longitude
+    )
+
+    request_object = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "curl/7.68",
+            "Accept": "application/json"
+        }
+    )
+
+    payload = None
+    last_error = None
+
+    # wttr.in is an external best-effort service and occasionally
+    # drops the connection, so retry once on transient network /
+    # timeout / connection errors before giving up.
+    for attempt in range(2):
+
+        try:
+
+            with urllib.request.urlopen(
+                request_object,
+                timeout=20
+            ) as response:
+
+                payload = json.loads(
+                    response.read().decode(
+                        "utf-8",
+                        "replace"
+                    )
+                )
+
+            break
+
+        except (
+            urllib.error.URLError,
+            TimeoutError,
+            OSError,
+            ConnectionError
+        ) as error:
+
+            last_error = error
+
+            time.sleep(1)
+
+            continue
+
+    if payload is None:
+
+        if last_error:
+
+            raise last_error
+
+        raise RuntimeError(
+            "wttr.in fallback request failed."
+        )
+
+    # ------------------------------------------------------------
+    # Normalise wttr.in payload into the Open-Meteo shape so the
+    # weather_data() route can continue unchanged.
+    # ------------------------------------------------------------
+
+    current_condition = payload.get(
+        "current_condition",
+        []
+    )
+
+    if not current_condition:
+
+        raise RuntimeError(
+            "wttr.in returned no current condition."
+        )
+
+    current_raw = current_condition[0]
+
+    weather_days = payload.get(
+        "weather",
+        []
+    )
+
+    today_raw = weather_days[0] if weather_days else {}
+
+    def _safe_float(value):
+
+        try:
+
+            return float(value)
+
+        except (TypeError, ValueError):
+
+            return 0.0
+
+    def _safe_int(value):
+
+        try:
+
+            return int(float(value))
+
+        except (TypeError, ValueError):
+
+            return 0
+
+    hourly_times = []
+    rain_probabilities = []
+    hourly_precipitation = []
+    hourly_temperatures = []
+
+    today_rain_probabilities = []
+    today_precipitation = []
+
+    # Aggregate hourly entries across every day wttr.in returns
+    # (typically 3 days) so that longer-window assessments (e.g.
+    # drought risk) get as much real rainfall history as the
+    # fallback source can provide, while the "today" daily block
+    # below stays based on the first day only.
+    for day_index, day in enumerate(weather_days):
+
+        for entry in day.get("hourly", []):
+
+            hourly_times.append(
+                str(
+                    entry.get("time", "")
+                )
+            )
+
+            rain_probabilities.append(
+                _safe_int(
+                    entry.get("chanceofrain", 0)
+                )
+            )
+
+            hourly_precipitation.append(
+                _safe_float(
+                    entry.get("precipMM", 0)
+                )
+            )
+
+            hourly_temperatures.append(
+                _safe_float(
+                    entry.get("tempC")
+                )
+            )
+
+            if day_index == 0:
+
+                today_rain_probabilities.append(
+                    _safe_int(
+                        entry.get("chanceofrain", 0)
+                    )
+                )
+
+                today_precipitation.append(
+                    _safe_float(
+                        entry.get("precipMM", 0)
+                    )
+                )
+
+    current_wmo = _wwo_to_wmo(
+        current_raw.get("weatherCode", 0)
+    )
+
+    data = {
+
+        "current": {
+
+            # Empty time => the route falls through to the first
+            # hourly rain probability below.
+            "time": "",
+
+            "temperature_2m": _safe_float(
+                current_raw.get("temp_C")
+            ),
+
+            "relative_humidity_2m": _safe_float(
+                current_raw.get("humidity")
+            ),
+
+            "precipitation": _safe_float(
+                current_raw.get("precipMM")
+            ),
+
+            "wind_speed_10m": _safe_float(
+                current_raw.get("windspeedKmph")
+            ),
+
+            "weather_code": current_wmo
+
+        },
+
+        "hourly": {
+
+            "time": hourly_times,
+
+            "precipitation_probability":
+                rain_probabilities,
+
+            "precipitation": hourly_precipitation,
+
+            "temperature_2m": hourly_temperatures
+
+        },
+
+        "daily": {
+
+            "temperature_2m_max": [
+                _safe_float(
+                    today_raw.get("maxtempC")
+                )
+            ],
+
+            "temperature_2m_min": [
+                _safe_float(
+                    today_raw.get("mintempC")
+                )
+            ],
+
+            "precipitation_sum": [
+                sum(today_precipitation)
+            ],
+
+            "precipitation_probability_max": [
+                max(today_rain_probabilities)
+                if today_rain_probabilities else 0
+            ],
+
+            "weather_code": [
+                current_wmo
+            ]
+
+        }
+
+    }
+
+    _WEATHER_FALLBACK_CACHE[cache_key] = {
+        "ts": time.time(),
+        "data": data
+    }
+
+    return data
+
 
 # ============================================================
 # WEATHER INSIGHTS PAGE
@@ -2215,12 +2743,55 @@ def weather_data():
 
         # ====================================================
         # FETCH WEATHER
+        # Open-Meteo first; if it is rate-limited / unreachable
+        # fall back to wttr.in so the page still gets weather.
         # ====================================================
 
-        weather = fetch_weather(
-            latitude,
-            longitude
-        )
+        weather_source = "Open-Meteo"
+
+        try:
+
+            weather = fetch_weather(
+                latitude,
+                longitude
+            )
+
+        except Exception as open_meteo_error:
+
+            print(
+                "OPEN-METEO ERROR:",
+                repr(open_meteo_error)
+            )
+
+            try:
+
+                weather = fetch_weather_fallback(
+                    latitude,
+                    longitude
+                )
+
+                weather_source = "wttr.in"
+
+            except Exception as fallback_error:
+
+                print(
+                    "WEATHER FALLBACK ERROR:",
+                    repr(fallback_error)
+                )
+
+                weather = None
+
+        if weather is None:
+
+            return jsonify({
+
+                "success": False,
+
+                "message":
+                    "Weather services are temporarily unavailable. "
+                    "Please try again later."
+
+            }), 503
 
         current = weather.get(
             "current",
@@ -2513,7 +3084,7 @@ def weather_data():
                 longitude,
 
             "source":
-                "Open-Meteo"
+                weather_source
 
         })
 
@@ -2700,6 +3271,8 @@ def predict_disease_api():
             "success": False,
             "error": str(error)
         }), 500
+
+    
 # ============================================================
 # PEST DETECTION PAGE
 # ============================================================
@@ -2960,6 +3533,245 @@ def predict_pest_api():
             prediction
 
     }), 200
+
+
+# ============================================================
+# REAL DISEASE MANAGEMENT / PREVENTION API
+# ============================================================
+
+@app.route("/api/disease-management", methods=["POST"])
+def disease_management_api():
+
+    if not session.get("user_id"):
+        return jsonify({
+            "success": False,
+            "error": "Please login first."
+        }), 401
+
+    try:
+
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data received."
+            }), 400
+
+        crop = str(data.get("crop", "")).strip()
+        disease = str(data.get("disease", "") or data.get("problem", "")).strip()
+
+        if not crop and not disease:
+            return jsonify({
+                "success": False,
+                "error": "Crop or disease information is required."
+            }), 400
+
+        result = get_disease_management(
+            crop=crop,
+            disease=disease,
+            confidence=data.get("confidence"),
+            severity=data.get("severity"),
+            temperature=data.get("temperature"),
+            humidity=data.get("humidity"),
+            rainfall=data.get("rainfall"),
+            location=data.get("location"),
+        )
+
+        return jsonify(result), 200
+
+    except Exception as error:
+
+        print("DISEASE MANAGEMENT ERROR:")
+        print(error)
+
+        return jsonify({
+            "success": False,
+            "error": str(error)
+        }), 500
+
+
+# ============================================================
+# REAL PEST MANAGEMENT / PREVENTION API
+# ============================================================
+
+@app.route("/api/pest-management", methods=["POST"])
+def pest_management_api():
+
+    if not session.get("user_id"):
+        return jsonify({
+            "success": False,
+            "error": "Please login first."
+        }), 401
+
+    try:
+
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data received."
+            }), 400
+
+        crop = str(data.get("crop", "")).strip()
+        pest = str(data.get("pest", "") or data.get("problem", "")).strip()
+
+        if not crop and not pest:
+            return jsonify({
+                "success": False,
+                "error": "Crop or pest information is required."
+            }), 400
+
+        result = get_pest_management(
+            crop=crop,
+            pest=pest,
+            confidence=data.get("confidence"),
+            severity=data.get("severity"),
+            temperature=data.get("temperature"),
+            humidity=data.get("humidity"),
+            rainfall=data.get("rainfall"),
+            location=data.get("location"),
+        )
+
+        return jsonify(result), 200
+
+    except Exception as error:
+
+        print("PEST MANAGEMENT ERROR:")
+        print(error)
+
+        return jsonify({
+            "success": False,
+            "error": str(error)
+        }), 500
+
+
+# ============================================================
+# CROP HEALTH MANAGEMENT PAGE
+# ============================================================
+
+@app.route("/crop-health-management", methods=["GET"])
+def crop_health_management_page():
+
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    return render_template("crop_health_management.html")
+
+
+# =========================================================
+# SHARED OPEN-METEO FORECAST FETCH
+# Used by the irrigation and drought assessment routes so they
+# resiliently handle the same 429 / network failures as the
+# weather-data route. Retries transient errors, short-circuits
+# the per-IP DAILY quota (where retrying is pointless), and
+# supports an optional OPEN_METEO_API_KEY env var which raises
+# Open-Meteo's daily limit substantially.
+# =========================================================
+
+def _open_meteo_forecast(params, timeout=15, retries=3):
+
+    url = "https://api.open-meteo.com/v1/forecast"
+
+    api_key = os.getenv("OPEN_METEO_API_KEY")
+
+    if api_key:
+
+        params = dict(params)
+        params["apikey"] = api_key
+
+    last_error = None
+
+    for attempt in range(retries):
+
+        try:
+
+            response = requests.get(
+                url,
+                params=params,
+                timeout=timeout
+            )
+
+            response.raise_for_status()
+
+            return response.json()
+
+        except requests.exceptions.HTTPError as error:
+
+            last_error = error
+
+            status_code = (
+                error.response.status_code
+                if error.response is not None
+                else None
+            )
+
+            if status_code == 429:
+
+                # Per-IP DAILY quota exhausted -> every retry
+                # returns the same 429, so bail out at once and
+                # let the caller fall back or degrade cleanly.
+                if error.response is not None:
+
+                    try:
+
+                        reason = (
+                            error.response.json()
+                            or {}
+                        ).get("reason", "")
+
+                    except Exception:
+
+                        reason = ""
+
+                    if (
+                        reason
+                        and "daily" in reason.lower()
+                        and "limit" in reason.lower()
+                    ):
+
+                        raise
+
+                retry_after = (
+                    error.response.headers.get(
+                        "Retry-After"
+                    )
+                    if error.response is not None
+                    else None
+                )
+
+                try:
+
+                    delay = float(retry_after)
+
+                except (TypeError, ValueError):
+
+                    delay = float(2 ** attempt)
+
+                time.sleep(delay)
+
+                continue
+
+            raise
+
+        except requests.exceptions.RequestException as error:
+
+            last_error = error
+
+            time.sleep(2 ** attempt)
+
+            continue
+
+    if last_error:
+
+        raise last_error
+
+    raise RuntimeError(
+        "Open-Meteo request failed."
+    )
+
+
 # =========================================================
 # SMART IRRIGATION - LIVE WEATHER ASSESSMENT
 # =========================================================
@@ -3036,8 +3848,6 @@ def assess_irrigation():
         # LIVE WEATHER FROM OPEN-METEO
         # =================================================
 
-        weather_url = "https://api.open-meteo.com/v1/forecast"
-
         params = {
 
             "latitude": latitude,
@@ -3065,19 +3875,74 @@ def assess_irrigation():
 
         }
 
-        response = requests.get(
+        weather_source = "Open-Meteo"
 
-            weather_url,
+        try:
 
-            params=params,
+            weather = _open_meteo_forecast(
+                params,
+                timeout=15
+            )
 
-            timeout=15
+        except Exception as open_meteo_error:
 
-        )
+            print(
+                "OPEN-METEO ERROR:",
+                repr(open_meteo_error)
+            )
 
-        response.raise_for_status()
+            try:
 
-        weather = response.json()
+                fallback = fetch_weather_fallback(
+                    latitude,
+                    longitude
+                )
+
+                fallback_current = fallback["current"]
+                fallback_hourly = fallback["hourly"]
+
+                weather = {
+                    "current": {
+                        "temperature_2m":
+                            fallback_current["temperature_2m"],
+                        "relative_humidity_2m":
+                            fallback_current[
+                                "relative_humidity_2m"
+                            ],
+                        "precipitation":
+                            fallback_current["precipitation"],
+                        "rain":
+                            fallback_current["precipitation"]
+                    },
+                    "hourly": {
+                        "precipitation_probability":
+                            fallback_hourly[
+                                "precipitation_probability"
+                            ],
+                        "precipitation":
+                            fallback_hourly["precipitation"],
+                        "rain":
+                            fallback_hourly["precipitation"],
+                        "et0_fao_evapotranspiration": [],
+                        "soil_moisture_0_to_1cm": []
+                    }
+                }
+
+                weather_source = "wttr.in"
+
+            except Exception as fallback_error:
+
+                print(
+                    "WEATHER FALLBACK ERROR:",
+                    repr(fallback_error)
+                )
+
+                return jsonify({
+                    "success": False,
+                    "error":
+                        "Live weather service could not be reached. "
+                        "Please try again."
+                }), 503
 
         # =================================================
         # CURRENT WEATHER
@@ -3559,7 +4424,7 @@ def assess_irrigation():
                 longitude,
 
             "weather_source":
-                "Open-Meteo",
+                weather_source,
 
             "analysis":
                 reasons
@@ -3703,8 +4568,6 @@ def assess_drought():
         # OPEN-METEO
         # ====================================================
 
-        weather_url = "https://api.open-meteo.com/v1/forecast"
-
         params = {
             "latitude": latitude,
             "longitude": longitude,
@@ -3730,15 +4593,71 @@ def assess_drought():
             "timezone": "auto"
         }
 
-        response = requests.get(
-            weather_url,
-            params=params,
-            timeout=20
-        )
+        weather_source = "Open-Meteo"
+        degraded_weather = False
 
-        response.raise_for_status()
+        try:
 
-        weather = response.json()
+            weather = _open_meteo_forecast(
+                params,
+                timeout=20
+            )
+
+        except Exception as open_meteo_error:
+
+            print(
+                "OPEN-METEO ERROR:",
+                repr(open_meteo_error)
+            )
+
+            # Open-Meteo's 30-day history is unavailable -> fall
+            # back to wttr.in (recent data only) so the page still
+            # returns a real, rainfall-based assessment instead of
+            # a hard error. et0 / soil moisture are not supplied by
+            # wttr.in, so the soil-moisture part of the score is
+            # skipped and the assessment is clearly labelled below.
+            try:
+
+                fallback = fetch_weather_fallback(
+                    latitude,
+                    longitude
+                )
+
+                fc = fallback["current"]
+                fh = fallback["hourly"]
+
+                weather = {
+                    "current": {
+                        "temperature_2m": fc["temperature_2m"],
+                        "relative_humidity_2m":
+                            fc["relative_humidity_2m"],
+                        "precipitation": fc["precipitation"],
+                        "rain": fc["precipitation"]
+                    },
+                    "hourly": {
+                        "temperature_2m": fh["temperature_2m"],
+                        "precipitation": fh["precipitation"],
+                        "et0_fao_evapotranspiration": [],
+                        "soil_moisture_0_to_1cm": []
+                    }
+                }
+
+                weather_source = "wttr.in"
+                degraded_weather = True
+
+            except Exception as fallback_error:
+
+                print(
+                    "WEATHER FALLBACK ERROR:",
+                    repr(fallback_error)
+                )
+
+                return jsonify({
+                    "success": False,
+                    "error":
+                        "Live weather service could not be reached. "
+                        "Please check your internet connection."
+                }), 503
 
         if "hourly" not in weather:
             return jsonify({
@@ -4218,6 +5137,19 @@ def assess_drought():
             )
 
         # ====================================================
+        # DEGRADED-DATA CAVEAT
+        # ====================================================
+
+        if degraded_weather:
+
+            analysis.append(
+                "Live 30-day weather history was unavailable; "
+                "this assessment used recent rainfall data from "
+                "an alternate source (wttr.in) and does not include "
+                "modeled soil-moisture or evapotranspiration."
+            )
+
+        # ====================================================
         # RESULT
         # ====================================================
 
@@ -4267,7 +5199,9 @@ def assess_drought():
 
             "longitude": longitude,
 
-            "weather_source": "Open-Meteo",
+            "weather_source": weather_source,
+
+            "degraded": degraded_weather,
 
             "analysis": analysis
         }
@@ -4295,7 +5229,7 @@ def assess_drought():
                 "Please check your internet connection."
         }), 503
 
-     # ========================================================
+    # ========================================================
     # GENERAL ERROR
     # ========================================================
 
@@ -4316,15 +5250,15 @@ def assess_drought():
 # ============================================================
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
-    init_database()
 
     print()
     print("==================================================")
     print("              🌱 AGRIMIND AI")
     print("==================================================")
+
+    # Initialize database BEFORE starting Flask
+    init_database()
+
     print("Flask server starting...")
     print("Open: http://127.0.0.1:5000")
     print()
@@ -4338,11 +5272,8 @@ if __name__ == "__main__":
     print()
 
     app.run(
-
         host="127.0.0.1",
-
         port=5000,
-
-        debug=True
-
+        debug=True,
+        use_reloader=False
     )

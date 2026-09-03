@@ -1,6 +1,14 @@
+import sys
 import requests
 import random
 import time
+
+# Make console output UTF-8 safe (Windows cp1252 cannot encode emoji).
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 
 # Flask API address

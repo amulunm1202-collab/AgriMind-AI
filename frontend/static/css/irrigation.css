@@ -1143,3 +1143,317 @@ body {
         grid-column: span 1;
     }
 }
+
+
+/* =========================================================
+   VIBRANT MODERN DASHBOARD REFRESH (CSS-only)
+   Colourful, energetic restyle. No IDs, markup or JS changed.
+========================================================= */
+
+:root {
+    --v-ink: #10241a;
+    --v-muted: #5f7368;
+}
+
+body {
+    background:
+        radial-gradient(900px 600px at 8% -6%, rgba(16, 185, 129, 0.18), transparent 55%),
+        radial-gradient(800px 520px at 96% 4%, rgba(14, 165, 233, 0.16), transparent 52%),
+        radial-gradient(760px 620px at 50% 108%, rgba(245, 158, 11, 0.12), transparent 55%),
+        linear-gradient(180deg, #f2fbf5 0%, #e9f9ef 55%, #f3fdf7 100%);
+    color: var(--v-ink);
+}
+
+/* ---------- NAVBAR ---------- */
+
+.navbar {
+    background: rgba(255, 255, 255, 0.78);
+    border-bottom: 1px solid rgba(16, 161, 80, 0.12);
+    box-shadow: 0 12px 34px rgba(20, 90, 50, 0.12);
+}
+
+.brand-logo {
+    background: linear-gradient(135deg, #16a34a, #14b8a6);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(22, 163, 74, 0.28);
+}
+
+.brand-name {
+    color: #0d6b3c;
+}
+
+.back-btn {
+    background: #e8f8ef;
+    color: #0f7a4d;
+    border: 1px solid #cdeeda;
+}
+
+.back-btn:hover {
+    background: #d3f2e0;
+    color: #0a5c38;
+}
+
+/* ---------- HERO ---------- */
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    padding: 46px 50px;
+    border-radius: 28px;
+    margin-bottom: 34px;
+    background:
+        linear-gradient(128deg, #0e8a50 0%, #10b981 46%, #12c5a8 76%, #22c55e 100%);
+    box-shadow: 0 26px 60px rgba(16, 150, 84, 0.32);
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    right: -60px;
+    top: -130px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.eyebrow {
+    color: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.16);
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    letter-spacing: 1.6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.hero h1 {
+    color: #ffffff;
+    text-shadow: 0 3px 22px rgba(15, 60, 35, 0.28);
+}
+
+.hero h1 span {
+    color: #d6ff7d;
+}
+
+.hero p {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-icon {
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 0 20px 50px rgba(9, 74, 42, 0.25);
+    backdrop-filter: blur(6px);
+}
+
+/* ---------- CARDS ---------- */
+
+.card {
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e2efe6;
+    border-radius: 24px;
+    box-shadow: 0 18px 45px rgba(22, 92, 52, 0.10);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #16a34a, #14b8a6, #0ea5e9);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 26px 58px rgba(22, 92, 52, 0.14);
+}
+
+.heading-icon {
+    background: linear-gradient(135deg, #e7f9ee, #e3f5fb);
+    color: #0f8a52;
+}
+
+.card-heading h2 {
+    color: #0d6b3c;
+}
+
+.live-badge {
+    background: linear-gradient(135deg, #16a34a, #10b981);
+    color: #fff;
+}
+
+/* ---------- INPUTS ---------- */
+
+.crop-input-wrapper {
+    background: #fbfefc;
+    border-radius: 14px;
+}
+
+.crop-input-wrapper:focus-within {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16);
+}
+
+.suggestions button {
+    background: #eef9f1;
+    border-color: #cfe9d7;
+    color: #167a48;
+}
+
+.suggestions button:hover {
+    background: #ddF4e5;
+    border-color: #9fd8b3;
+    color: #0a5f37;
+}
+
+.location-box {
+    background: #f2fbf5;
+    border-color: #d6ecdd;
+}
+
+/* ---------- ASSESS BUTTON ---------- */
+
+.assess-btn {
+    background: linear-gradient(135deg, #0f9d56, #16c79a);
+    box-shadow: 0 14px 30px rgba(15, 157, 86, 0.30);
+}
+
+.assess-btn:hover {
+    background: linear-gradient(135deg, #0c8749, #0fb886);
+    box-shadow: 0 18px 38px rgba(15, 157, 86, 0.38);
+}
+
+/* ---------- WEATHER TILES ---------- */
+
+.weather-grid {
+    gap: 14px;
+}
+
+.weather-item {
+    border: 1px solid transparent;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.weather-item:nth-child(1) { background: #fff4e6; border-color: #f6d9ac; }
+.weather-item:nth-child(2) { background: #e7f7ff; border-color: #c1e5fa; }
+.weather-item:nth-child(3) { background: #eafaf0; border-color: #bfead3; }
+.weather-item:nth-child(4) { background: #eef0ff; border-color: #d0d4fb; }
+.weather-item.wide   { background: #f0edff; border-color: #d0c8fa; }
+
+.weather-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(30, 80, 50, 0.10);
+}
+
+/* ---------- RESULT ---------- */
+
+.result-card {
+    border: none;
+    background:
+        radial-gradient(600px 340px at 12% 0%, rgba(16, 185, 129, 0.10), transparent 55%),
+        linear-gradient(135deg, #ffffff, #f1fcf5);
+    border-radius: 28px;
+    box-shadow: 0 24px 62px rgba(20, 90, 50, 0.14);
+    animation: irrFadeUp 0.5s ease both;
+}
+
+.result-header h2 {
+    color: #0d6b3c;
+}
+
+.result-badge {
+    background: linear-gradient(135deg, #16a34a, #12c5a8);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(16, 150, 84, 0.25);
+}
+
+.result-message {
+    color: #46604f;
+}
+
+/* ---------- METRIC TILES ---------- */
+
+.metric {
+    border: 1px solid transparent;
+    border-radius: 16px;
+    background: #ffffff;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.metric:nth-child(1) { background: #e7f6ff; border-color: #c6e6fb; }
+.metric:nth-child(2) { background: #e9f9ef; border-color: #bfead3; }
+.metric:nth-child(3) { background: #fef0d9; border-color: #f3d9a8; }
+.metric:nth-child(4) { background: #f1edff; border-color: #d4cdf7; }
+
+.metric:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px rgba(30, 80, 50, 0.12);
+}
+
+.metric-icon {
+    background: rgba(255, 255, 255, 0.75);
+    color: #0f8a52;
+}
+
+.metric strong {
+    color: #1c3a28;
+}
+
+/* ---------- ANALYSIS ---------- */
+
+.analysis-item {
+    background: #f1fbf5;
+    border: 1px solid #dff2e7;
+    color: #46604f;
+}
+
+.analysis-item span {
+    color: #0f9d56;
+}
+
+/* ---------- TIP ---------- */
+
+.tip-box {
+    background: linear-gradient(135deg, #fff7e0, #ffefc4);
+    border: 1px solid #f0dda0;
+}
+
+.tip-box strong { color: #7a5ea7; }
+.tip-box p { color: #8a6f2c; }
+
+/* ---------- EMPTY STATE ---------- */
+
+.empty-state {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px dashed #bcd8c5;
+    border-radius: 24px;
+}
+
+.empty-icon {
+    color: #0f9d56;
+}
+
+/* ---------- ENTRANCE ANIMATION ---------- */
+
+@keyframes irrFadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero::after { display: none; }
+    .result-card { animation: none; }
+    .card:hover,
+    .weather-item:hover,
+    .metric:hover { transform: none; }
+}
+
+@media (max-width: 850px) {
+    .hero { padding: 34px 30px; }
+}

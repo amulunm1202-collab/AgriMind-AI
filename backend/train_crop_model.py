@@ -3,8 +3,16 @@
 # ============================================================
 
 import os
+import sys
 import pickle
 import pandas as pd
+
+# Make console output UTF-8 safe (Windows cp1252 cannot encode emoji).
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
