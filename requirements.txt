@@ -10,8 +10,10 @@ pillow==12.3.0
 
 tensorflow==2.21.0
 
-torch==2.13.0
-torchvision==0.28.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch==2.13.0+cpu
+torchvision==0.28.0+cpu
 ultralytics==8.4.131
 
 google-genai==2.19.0
