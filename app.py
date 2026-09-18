@@ -151,9 +151,12 @@ STATIC_DIR = os.path.join(
     "static"
 )
 
-DATABASE_DIR = os.path.join(
-    BASE_DIR,
-    "database"
+DATABASE_DIR = os.getenv(
+    "DATABASE_DIR",
+    os.path.join(
+        BASE_DIR,
+        "database"
+    )
 )
 
 DATABASE_PATH = os.path.join(
@@ -183,7 +186,10 @@ app = Flask(
     static_folder=STATIC_DIR
 )
 
-app.secret_key = "agrimind-ai-development-key"
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "agrimind-ai-development-key"
+)
 
 CORS(app)
 # ============================================================
@@ -208,9 +214,12 @@ BASE_DIR = os.path.dirname(
 # DATABASE DIRECTORY
 # ============================================================
 
-DATABASE_DIR = os.path.join(
-    BASE_DIR,
-    "database"
+DATABASE_DIR = os.getenv(
+    "DATABASE_DIR",
+    os.path.join(
+        BASE_DIR,
+        "database"
+    )
 )
 
 

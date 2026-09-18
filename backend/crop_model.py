@@ -3,6 +3,7 @@
 # ============================================================
 
 from pathlib import Path
+import pickle
 
 import pandas as pd
 import numpy as np
@@ -30,9 +31,9 @@ DATASET_PATH = (
 # ============================================================
 
 FEATURES = [
-    "N",
-    "P",
-    "K",
+    "n",
+    "p",
+    "k",
     "temperature",
     "humidity",
     "ph",
@@ -92,16 +93,8 @@ Expected location:
     # STANDARDIZE NPK
     # --------------------------------------------------------
 
-    rename_map = {
-        "n": "N",
-        "p": "P",
-        "k": "K"
-    }
-
-    df.rename(
-        columns=rename_map,
-        inplace=True
-    )
+    # Columns were already lowercased above, so N/P/K are now
+    # n/p/k — exactly matching the deployed model's features.
 
     # --------------------------------------------------------
     # CHECK
@@ -290,13 +283,54 @@ def train_model():
 # ENSURE MODEL
 # ============================================================
 
+def load_saved_model():
+
+    global model
+    global model_accuracy
+
+    pkl_path = (
+        BASE_DIR
+        / "models"
+        / "crop_recommendation_model.pkl"
+    )
+
+    if not pkl_path.exists():
+        return False
+
+    try:
+
+        with open(pkl_path, "rb") as fh:
+
+            payload = pickle.load(fh)
+
+        if isinstance(payload, dict):
+            model = payload.get("model", None)
+            model_accuracy = payload.get("accuracy", 0.0) or 0.0
+        else:
+            model = payload
+
+        print("✓ Crop model loaded from .pkl")
+
+        return model is not None
+
+    except Exception as error:
+
+        print("⚠️ Could not load crop .pkl:", repr(error))
+
+        model = None
+
+        return False
+
+
 def ensure_model():
 
     global model
 
     if model is None:
 
-        train_model()
+        if not load_saved_model():
+
+            train_model()
 
 
 # ============================================================
@@ -646,17 +680,20 @@ def get_model_info():
 
 
 # ============================================================
-# TRAIN WHEN APP STARTS
+# LOAD MODEL WHEN APP STARTS
 # ============================================================
 
 try:
 
-    train_model()
+    if not load_saved_model():
+
+        # No saved model found locally; fall back to training.
+        train_model()
 
 except Exception as error:
 
     print("\n==============================================")
-    print("CROP MODEL TRAINING FAILED")
+    print("CROP MODEL LOAD FAILED")
     print("==============================================")
 
     print(
