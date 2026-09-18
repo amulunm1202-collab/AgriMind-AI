@@ -352,13 +352,15 @@ def predict_pest(image_path):
 
             device="cpu",
 
-            imgsz=1024,
+            imgsz=640,
 
-            conf=0.05,
+            conf=0.10,
 
-            augment=True,
+            augment=False,
 
-            verbose=False
+            verbose=False,
+
+            max_det=10
         )
 
     except Exception as error:
