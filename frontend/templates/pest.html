@@ -1241,19 +1241,53 @@ analyzeButton.addEventListener(
 
         try {
 
-            const response =
-                await fetch(
-                    "/predict-pest",
-                    {
-                        method: "POST",
-                        body: formData
-                    }
-                );
+    const response =
+        await fetch(
+            "/predict-pest",
+            {
+                method: "POST",
+                body: formData,
+                credentials: "same-origin"
+            }
+        );
 
+    const contentType =
+        response.headers.get("content-type") || "";
 
-            const data =
-                await response.json();
+    let data;
 
+    if (contentType.includes("application/json")) {
+
+        data = await response.json();
+
+    } else {
+
+        const text =
+            await response.text();
+
+        console.error(
+            "NON-JSON RESPONSE:",
+            {
+                status: response.status,
+                url: response.url,
+                contentType: contentType,
+                body: text.substring(0, 500)
+            }
+        );
+
+        if (response.status === 401) {
+
+            throw new Error(
+                "Your login session has expired. Please login again."
+            );
+
+        }
+
+        throw new Error(
+            "Server returned an HTML/error page. Please check Render logs."
+        );
+
+    }
 
             loading.style.display =
                 "none";
